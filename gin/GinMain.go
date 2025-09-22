@@ -42,8 +42,11 @@ func main() {
 			"message": "pong",
 		})
 	})
-	router.SetTrustedProxies([]string{"192.168.1.2"})
-
+	err := router.SetTrustedProxies([]string{"192.168.1.2"})
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	// 使用预定义的 gin.PlatformXXX 头
 	// Google App Engine
 	router.TrustedPlatform = gin.PlatformGoogleAppEngine
@@ -126,9 +129,13 @@ func main() {
 
 		for _, file := range files {
 			log.Println(file.Filename)
-
 			// 上传文件至指定目录
-			c.SaveUploadedFile(file, "./files/"+file.Filename)
+			err := c.SaveUploadedFile(file, "./files/"+file.Filename)
+			if err != nil {
+				log.Println("文件保存失败 ", err)
+				c.String(http.StatusBadRequest, fmt.Sprintf("%d files error upload!", len(files)))
+				return
+			}
 		}
 		c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
 	})
@@ -139,7 +146,12 @@ func main() {
 
 		dst := "./" + file.Filename
 		// 上传文件至指定的完整文件路径
-		c.SaveUploadedFile(file, dst+file.Filename)
+		err := c.SaveUploadedFile(file, dst+file.Filename)
+		if err != nil {
+			log.Println("文件保存失败 ", err)
+			c.String(http.StatusBadRequest, "files error upload!")
+			return
+		}
 		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 	})
 
@@ -151,7 +163,11 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	s.ListenAndServe()
+	err = s.ListenAndServe()
+	if err != nil {
+		log.Println("启动失败 ", err)
+		return
+	}
 
 	//router.Run(":8080") // 默认监听 0.0.0.0:8080
 }
