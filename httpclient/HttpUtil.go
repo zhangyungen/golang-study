@@ -193,12 +193,17 @@ func (hc *HTTPClient) request(method HTTPMethod, path string, body io.Reader, op
 
 // buildURL 构建完整URL
 func (hc *HTTPClient) buildURL(path string, query map[string]string) (string, error) {
-	u, err := url.Parse(hc.baseURL)
-	if err != nil {
-		return "", err
+	u := &url.URL{}
+	err := error(nil)
+	if hc.baseURL == "" {
+		u, err = url.Parse(path)
+	} else {
+		u, err = url.Parse(hc.baseURL)
+		if err != nil {
+			return "", err
+		}
+		u.Path = strings.TrimSuffix(u.Path, "/") + "/" + strings.TrimPrefix(path, "/")
 	}
-
-	u.Path = strings.TrimSuffix(u.Path, "/") + "/" + strings.TrimPrefix(path, "/")
 
 	// 添加查询参数
 	if len(query) > 0 {
