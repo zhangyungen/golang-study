@@ -3,6 +3,7 @@ package str
 import (
 	"bytes"
 	"fmt"
+	"github.com/goccy/go-json"
 	"math/rand"
 	"net/mail"
 	"regexp"
@@ -456,4 +457,17 @@ func SubstringByRune(s string, start, length int) string {
 	}
 
 	return string(runes[start:end])
+}
+
+// ObjToJson 对象转JSON字符串
+func ObjToJson[T any](obj T) (string, error) {
+	meta, err := json.Marshal(obj)
+	return string(meta), err
+}
+
+// JsonToObj 字符串转对象
+func JsonToObj[T any](str string) (T, error) {
+	var result T
+	err := json.Unmarshal([]byte(str), &result)
+	return result, err
 }

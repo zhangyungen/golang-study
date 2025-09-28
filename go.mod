@@ -5,6 +5,7 @@ go 1.23.12
 require (
 	git.inner.truesightai.com/zyj1/ai-gc v1.0.5
 	github.com/gin-gonic/gin v1.11.0
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-xorm/xorm v0.7.9
 	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.10.7
@@ -27,7 +28,6 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
-	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/goccy/go-yaml v1.18.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
