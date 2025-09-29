@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/go-xorm/xorm"
 	_ "github.com/mattn/go-sqlite3"
+	"xorm.io/xorm"
 )
 
 func main() {
