@@ -2,7 +2,9 @@
 package database
 
 import (
+	"errors"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/petermattis/goid"
 	"log"
 	"sync"
 	"time"
@@ -10,8 +12,9 @@ import (
 )
 
 var (
-	engine *xorm.Engine
-	once   sync.Once
+	engine     *xorm.Engine
+	once       sync.Once
+	sessionMap = make(map[int64]*xorm.Session, 10)
 )
 
 // Init 初始化数据库连接
@@ -21,6 +24,8 @@ func Init(driver, dsn string) error {
 	once.Do(func() {
 		engine, err = xorm.NewEngine(driver, dsn)
 		if err != nil {
+			log.Println("Failed to connect to database:", err)
+			panic(err)
 			return
 		}
 
@@ -34,9 +39,9 @@ func Init(driver, dsn string) error {
 
 		// 测试连接
 		if err = engine.Ping(); err != nil {
-			return
+			log.Println("Failed to ping database:", err)
+			panic(err)
 		}
-
 		log.Println("Database connected successfully")
 	})
 
@@ -52,7 +57,7 @@ func GetEngine() *xorm.Engine {
 }
 
 // Close 关闭数据库连接
-func Close() error {
+func CloseEngine() error {
 	if engine != nil {
 		return engine.Close()
 	}
@@ -61,7 +66,19 @@ func Close() error {
 
 // NewSession 创建新的数据库会话
 func NewSession() *xorm.Session {
-	//id := goid.Get() // 直接获取当前 goroutine 的 ID
+	id := goid.Get() // 直接获取当前 goroutine 的 ID
+	sessionMap[id] = GetEngine().NewSession()
+	return sessionMap[id]
+}
 
-	return GetEngine().NewSession()
+// CloseSession 关闭数据库回话
+func CloseSession(session *xorm.Session) error {
+	id := goid.Get() // 直接获取当前 goroutine 的 ID
+	if sessionMap[id] != session {
+		return errors.New("关闭session 失败，不是同一个session，请忽使用 goroutine ")
+	}
+	session.Commit()
+	err := session.Close()
+	delete(sessionMap, id)
+	return err
 }

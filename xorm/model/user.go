@@ -16,7 +16,3 @@ type User struct {
 func (User) TableName() string {
 	return "users"
 }
-
-func (User) Session() string {
-	return "users"
-}
