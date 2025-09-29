@@ -75,9 +75,8 @@ func NewSession() *xorm.Session {
 func CloseSession(session *xorm.Session) error {
 	id := goid.Get() // 直接获取当前 goroutine 的 ID
 	if sessionMap[id] != session {
-		return errors.New("关闭session 失败，不是同一个session，请忽使用 goroutine ")
+		return errors.New("close session failed，close session and goroutine session is not same，don use goroutine for you session code ")
 	}
-	session.Commit()
 	err := session.Close()
 	delete(sessionMap, id)
 	return err
