@@ -64,15 +64,13 @@ func (s *UserService) UpdateUser(user *model.User) error {
 	if user.ID <= 0 {
 		return errors.New("invalid user id")
 	}
-
 	session := s.getDBSession()
 	defer s.closeDBSession(session)
-	// 检查用户是否存在
+	//检查用户是否存在
 	existing, err := s.userDAO.GetByID(session, user.ID)
 	if err != nil {
 		return err
 	}
-
 	// 如果邮箱有变更，检查新邮箱是否被其他用户使用
 	if user.Email != existing.Email {
 		exist, err := s.userDAO.ExistByEmail(session, user.Email)
@@ -83,8 +81,7 @@ func (s *UserService) UpdateUser(user *model.User) error {
 			return errors.New("email already used by another user")
 		}
 	}
-
-	return s.userDAO.Update(session, user)
+	return s.userDAO.UpdateById(session, user.ID, user)
 }
 
 // DeleteUser 删除用户

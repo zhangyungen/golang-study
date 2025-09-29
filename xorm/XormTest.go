@@ -13,7 +13,7 @@ func main() {
 	database.Init("mysql", "root:zj123456@tcp(localhost:3306)/test?charset=utf8mb4&parseTime=True&loc=Local")
 	//database.GetEngine().Sync2(new(model.User))
 
-	service.UserServiceInstance.CreateUser(&model.User{Name: "zyj", Email: "zyj@163.com"})
-
+	service.UserServiceInstance.CreateUser(&model.User{Name: "zyj2", Email: "zyj3@163.com"})
+	service.UserServiceInstance.UpdateUser(&model.User{ID: 1, Name: "zyjfdsafdasfa"})
 	log.Printf("after insert")
 }

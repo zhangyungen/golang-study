@@ -28,8 +28,8 @@ func (d *BaseDAO[T, K]) GetByID(session *xorm.Session, id K) (*T, error) {
 }
 
 // Update 更新用户
-func (d *BaseDAO[T, K]) Update(session *xorm.Session, user *T) error {
-	_, err := session.Update(user)
+func (d *BaseDAO[T, K]) UpdateById(session *xorm.Session, id K, user *T) error {
+	_, err := session.ID(id).Update(user)
 	return err
 }
 
