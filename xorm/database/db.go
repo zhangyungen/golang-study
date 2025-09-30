@@ -12,10 +12,9 @@ import (
 )
 
 var (
-	engine      *xorm.Engine
-	once        sync.Once
-	sessionMap  = make(map[int64]*xorm.Session, 10)
-	transaction = make(map[int64]bool, 10)
+	engine     *xorm.Engine
+	once       sync.Once
+	sessionMap = make(map[int64]*xorm.Session, 10)
 )
 
 // Init 初始化数据库连接

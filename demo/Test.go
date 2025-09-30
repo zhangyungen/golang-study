@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"github.com/google/uuid"
-	"time"
-	"zyj.com/golang-study/util/str"
-	timeUtil "zyj.com/golang-study/util/time"
+	"log"
+	"zyj.com/golang-study/util/obj"
+	"zyj.com/golang-study/xorm/model"
+	"zyj.com/golang-study/xorm/param"
+	"zyj.com/golang-study/xorm/result"
 )
 
 /*
@@ -51,17 +51,41 @@ const (
 
 func main() {
 
-	fmt.Println("=== Go 语言位运算 ===\n")
-	fmt.Println("TokenTypeBitRefresh:", TokenTypeBitRefresh)
-	fmt.Println("TokenTypeBitWeb:", TokenTypeBitWeb)
-	fmt.Println("TypeBitPixCake:", TypeBitPixCake)
-	fmt.Println("TypeBitPixSoda:", TypeBitPixSoda)
-	fmt.Println("TokenTypeBitPixIpad:", TokenTypeBitPixIpad)
-	fmt.Println("TokenTypeSodaLogin:", TokenTypeSodaLogin)
-	println(timeUtil.AddDays(time.Now(), 1).Unix())
-	println(str.CountMatches("test234r4", "test"))
-	println(str.StringsStartWith([]string{"test234r4", "estfdsafas"}, "est"))
-	println(uuid.New().String())
+	var param2 = result.PageVO[model.User]{}
+	var param1 = param.PageParam{Page: 1, PageSize: 10}
+	obj.ObjToObj(&param1, &param2)
+	log.Println("param2 ObjToObj", obj.ObjToJsonStr(param2))
+
+	param1.PageSize = 1000
+	param1.Page = 11
+
+	//var param4 = result.PageVO[model.User]{}
+	//obj.CopierObj(&param1, &param4)
+	//log.Println("CopierObj param4", obj.ObjToJsonStr(param4))
+
+	obj2Map := obj.ObjToMap(&param1)
+	log.Println("obj2Map", obj2Map)
+
+	param1Ptr := obj.MapToObj[param.PageParam](obj2Map)
+	log.Println("MapToObj", param1Ptr)
+
+	var param3 = result.PageVO[model.User]{}
+	json := obj.ObjToJsonStr(param1)
+	obj.JsonStrToObj(json, &param3)
+	log.Println("ObjToJsonStr param3", obj.ObjToJsonStr(&param3))
+
+	//
+	//fmt.Println("=== Go 语言位运算 ===\n")
+	//fmt.Println("TokenTypeBitRefresh:", TokenTypeBitRefresh)
+	//fmt.Println("TokenTypeBitWeb:", TokenTypeBitWeb)
+	//fmt.Println("TypeBitPixCake:", TypeBitPixCake)
+	//fmt.Println("TypeBitPixSoda:", TypeBitPixSoda)
+	//fmt.Println("TokenTypeBitPixIpad:", TokenTypeBitPixIpad)
+	//fmt.Println("TokenTypeSodaLogin:", TokenTypeSodaLogin)
+	//println(timeUtil.AddDays(time.Now(), 1).Unix())
+	//println(str.CountMatches("test234r4", "test"))
+	//println(str.StringsStartWith([]string{"test234r4", "estfdsafas"}, "est"))
+	//println(uuid.New().String())
 
 	//logger, _ := zap.NewProduction()
 	//defer logger.Sync() // flushes buffer, if any
