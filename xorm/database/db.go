@@ -89,6 +89,8 @@ func CloseSession(session *xorm.Session) error {
 		err := session.Close()
 		delete(sessionMap, id)
 		return err
+	} else {
+		log.Println("session is in transaction,don't close")
 	}
 	return nil
 }

@@ -31,14 +31,17 @@ func (biz *UserQueryBiz) LogIn(param *param.UserLogin) (bool, error) {
 		if param.Pwd != user.Pwd {
 			return false, errors.New("用户名或密码错误")
 		} else {
-			biz.userLoginLogService.Create(&model.UserLoginLog{
+			err := biz.userLoginLogService.Create(&model.UserLoginLog{
 				LoginIp:     "192.168.1.1",
-				LoginTime:   time.Time{},
+				LoginTime:   time.Now(),
 				UserId:      user.Id,
-				CreatedTime: time.Time{},
-				UpdatedTime: time.Time{},
-				DeletedTime: time.Time{},
+				CreatedTime: time.Now(),
+				UpdatedTime: time.Now(),
+				DeletedTime: time.Now(),
 			})
+			if err != nil {
+				return false, err
+			}
 			return true, nil
 		}
 	} else {

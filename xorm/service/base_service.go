@@ -51,5 +51,8 @@ func (b *BaseService[T, K]) PageList(param *param.PageParam) ([]*T, error) {
 // Count 统计数量
 func (b *BaseService[T, K]) Count(entity *T) (int64, error) {
 	return b.baseDAO.Count(b.getDBSession(), entity)
+}
 
+func (biz *BaseService[T, K]) ExecuteTx(fn func() error) error {
+	return database.WithTransaction(fn)
 }
