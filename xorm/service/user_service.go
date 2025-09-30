@@ -6,6 +6,7 @@ import (
 	"zyj.com/golang-study/xorm/dao"
 	"zyj.com/golang-study/xorm/model"
 	"zyj.com/golang-study/xorm/param"
+	"zyj.com/golang-study/xorm/result"
 )
 
 // UserService 用户Service
@@ -72,16 +73,19 @@ func (s *UserService) DeleteUserById(id int64) error {
 }
 
 // ListUsers 用户列表
-func (s *UserService) PageList(param *param.PageParam) ([]*model.User, error) {
-	if param.Page <= 0 {
-		param.Page = 1
-	}
-	if param.PageSize <= 0 || param.PageSize > 100 {
-		param.PageSize = 20
-	}
+func (s *UserService) PageList(param *param.PageParam) (result.PageVO[model.User], error) {
 	session := s.getDBSession()
 	defer s.closeDBSession(session)
-	return s.userDAO.PageList(session, param)
+
+	list, err := s.userDAO.PageList(session, param)
+	if err != nil {
+		return result.PageVO[model.User]{}, err
+	}
+	count, err := session.Count(&model.User{})
+	if err != nil {
+		return result.PageVO[model.User]{}, err
+	}
+	return result.Convert2PageVO(param, count, list), nil
 }
 
 // ValidateUser 验证用户数据

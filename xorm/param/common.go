@@ -2,9 +2,9 @@ package param
 
 type PageParam struct {
 	Page       int    `json:"page" form:"page"`
-	PageSize   int    `json:"page_size" form:"page_size"`
-	OrderField string `json:"order_field" form:"order_field"`
-	OrderAsc   bool   `json:"order_asc" form:"order_asc"`
+	PageSize   int    `json:"pageSize" form:"pageSize"`
+	OrderField string `json:"orderField" form:"orderField"`
+	OrderAsc   bool   `json:"orderAsc" form:"orderAsc"`
 }
 
 type Id[T any] struct {

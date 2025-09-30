@@ -43,14 +43,14 @@ func (d *BaseDAO[T, K]) Insert(session *xorm.Session, entity *T) error {
 	return err
 }
 
-func (d *BaseDAO[T, K]) PageList(session *xorm.Session, param *param.PageParam) ([]*T, error) {
+func (d *BaseDAO[T, K]) PageList(session *xorm.Session, param *param.PageParam) ([]T, error) {
 	if param.Page <= 0 {
 		param.Page = 1
 	}
 	if param.PageSize <= 0 {
 		param.PageSize = 10
 	}
-	var entitys []*T
+	var entitys []T
 	err := session.Limit(param.PageSize, param.PageSize*(param.Page-1)).Find(&entitys)
 	return entitys, err
 }

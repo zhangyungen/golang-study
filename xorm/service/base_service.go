@@ -44,7 +44,7 @@ func (b *BaseService[T, K]) Create(entity *T) error {
 	return b.baseDAO.Insert(b.getDBSession(), entity)
 }
 
-func (b *BaseService[T, K]) PageList(param *param.PageParam) ([]*T, error) {
+func (b *BaseService[T, K]) PageList(param *param.PageParam) ([]T, error) {
 	return b.baseDAO.PageList(b.getDBSession(), param)
 }
 

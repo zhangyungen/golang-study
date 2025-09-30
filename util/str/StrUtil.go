@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/goccy/go-json"
+	"log"
 	"math/rand"
 	"net/mail"
 	"regexp"
@@ -460,9 +461,13 @@ func SubstringByRune(s string, start, length int) string {
 }
 
 // ObjToJson 对象转JSON字符串
-func ObjToJson[T any](obj T) (string, error) {
+func ObjToJson[T any](obj T) string {
 	meta, err := json.Marshal(obj)
-	return string(meta), err
+	if err != nil {
+		log.Printf("ObjToJson", err)
+		return ""
+	}
+	return string(meta)
 }
 
 // JsonToObj 字符串转对象

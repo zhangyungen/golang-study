@@ -3,6 +3,7 @@ package main
 import (
 	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"zyj.com/golang-study/util/str"
 	"zyj.com/golang-study/xorm/biz"
 	"zyj.com/golang-study/xorm/database"
 	"zyj.com/golang-study/xorm/model"
@@ -33,6 +34,13 @@ func main() {
 		log.Println(err)
 	} else {
 		log.Println("登录状态 %v", in)
+	}
+
+	pages, err := biz.UserQueryBizIns.PageListUser(&param.PageParam{Page: 1, PageSize: 10})
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Println("分页查询结果", str.ObjToJson(pages))
 	}
 	//业务代码结束
 
