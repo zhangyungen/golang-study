@@ -35,7 +35,9 @@ func Init(driver, dsn string) error {
 		engine.SetConnMaxLifetime(time.Hour)
 		// 显示SQL日志（开发环境）
 		engine.ShowSQL(true)
-
+		//group, err := xorm.NewEngineGroup("postgres", nil)
+		//group.Master()
+		//group.Slave()
 		// 测试连接
 		if err = engine.Ping(); err != nil {
 			log.Println("Failed to ping database:", err)
@@ -48,7 +50,7 @@ func Init(driver, dsn string) error {
 }
 
 // GetEngine 获取数据库引擎（单例）
-func GetEngine() *xorm.Engine {
+func getEngine() *xorm.Engine {
 	if engine == nil {
 		panic("database engine not initialized, please call Init first")
 	}
@@ -69,7 +71,7 @@ func GetDBSession() *xorm.Session {
 	if sessionMap[id] != nil {
 		return sessionMap[id]
 	}
-	sessionMap[id] = GetEngine().NewSession()
+	sessionMap[id] = getEngine().NewSession()
 	return sessionMap[id]
 }
 
@@ -82,7 +84,23 @@ func CloseSession(session *xorm.Session) error {
 	if sessionMap[id] != session {
 		return errors.New("close session failed，close session and goroutine session is not same，don use goroutine for you session code ")
 	}
-	err := session.Close()
-	delete(sessionMap, id)
-	return err
+	if !session.IsInTx() {
+		err := session.Close()
+		delete(sessionMap, id)
+		return err
+	}
+	return nil
+}
+
+func WithTransaction(fn func() error) error {
+	session := GetDBSession()
+	defer CloseSession(session)
+	if err := session.Begin(); err != nil {
+		return err
+	}
+	if err := fn(); err != nil {
+		_ = session.Rollback()
+		return err
+	}
+	return session.Commit()
 }

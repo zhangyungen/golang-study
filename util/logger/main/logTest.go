@@ -1,4 +1,4 @@
-// example/main.go
+// reverse/main.go
 package main
 
 import (

@@ -15,7 +15,7 @@ type UserQueryBiz struct {
 	userDAO *dao.UserDAO
 }
 
-// 全局用户Service实例
+// 全局UserQueryBizIns实例
 var UserQueryBizIns = &UserQueryBiz{&service.BaseService[model.User, int64]{}, dao.UserDaoInstance}
 
 // LogIn 登录

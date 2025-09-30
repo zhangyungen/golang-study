@@ -1,0 +1,40 @@
+kind: reverse
+name: mydb
+source:
+  database: mysql
+  conn_str: root:zj123456@tcp(localhost:3306)/test?charset=utf8mb4&parseTime=True&loc=Local
+targets:
+  - type: codes
+    include_tables: # tables included, you can use **
+      - a
+      - b
+    exclude_tables: # tables excluded, you can use **
+      - c
+    table_mapper: snake # how table name map to class or struct name
+    column_mapper: snake # how column name map to class or struct field name
+    table_prefix: "" # table prefix
+    multiple_files: true # generate multiple files or one
+    language: golang
+    template: | # template for code file, it has higher perior than template_path
+      package models
+      
+      {{$ilen := len .Imports}}
+      {{if gt $ilen 0}}
+      import (
+        {{range .Imports}}"{{.}}"{{end}}
+      )
+      {{end}}
+      
+      {{range .Tables}}
+      type {{TableMapper .Name}} struct {
+      {{$table := .}}
+      {{range .ColumnsSeq}}{{$col := $table.GetColumn .}}	{{ColumnMapper $col.Name}}	{{Type $col}} `{{Tag $table $col}}`
+      {{end}}
+      }
+      
+      func (m *{{TableMapper .Name}}) TableName() string {
+      	return "{{$table.Name}}"
+      }
+      {{end}}
+    template_path: ./template/goxorm.tmpl # template path for code file, it has higher perior than template field on language
+    output_dir: ./xorm/reverse/model # code output directory

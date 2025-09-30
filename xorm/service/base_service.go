@@ -23,20 +23,3 @@ func (b BaseService[T, K]) getDBSession() *xorm.Session {
 func (b BaseService[T, K]) closeDBSession(session *xorm.Session) {
 	database.CloseSession(session)
 }
-
-// WithTransaction 执行事务
-func (b BaseService[T, K]) WithTransaction(fn func(*xorm.Session) error) error {
-	session := b.getDBSession()
-	defer session.Close()
-
-	if err := session.Begin(); err != nil {
-		return err
-	}
-
-	if err := fn(session); err != nil {
-		_ = session.Rollback()
-		return err
-	}
-
-	return session.Commit()
-}

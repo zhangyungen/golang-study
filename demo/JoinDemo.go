@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"zyj.com/golang-study/data"
+	"zyj.com/golang-study/util/data"
 )
 
 type IDable interface {
