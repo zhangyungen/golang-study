@@ -1,4 +1,4 @@
-// common/database/xorm.go
+// common/database/db.go
 package database
 
 import (
@@ -64,9 +64,12 @@ func CloseEngine() error {
 	return nil
 }
 
-// NewSession 创建新的数据库会话
-func NewSession() *xorm.Session {
+// getDBSession 创建新的数据库会话
+func GetDBSession() *xorm.Session {
 	id := goid.Get() // 直接获取当前 goroutine 的 ID
+	if sessionMap[id] != nil {
+		return sessionMap[id]
+	}
 	sessionMap[id] = GetEngine().NewSession()
 	return sessionMap[id]
 }
@@ -74,6 +77,9 @@ func NewSession() *xorm.Session {
 // CloseSession 关闭数据库回话
 func CloseSession(session *xorm.Session) error {
 	id := goid.Get() // 直接获取当前 goroutine 的 ID
+	if session == nil {
+		return errors.New("argument session is nil ,don't close ")
+	}
 	if sessionMap[id] != session {
 		return errors.New("close session failed，close session and goroutine session is not same，don use goroutine for you session code ")
 	}

@@ -15,26 +15,18 @@ type UserDAO struct {
 // 全局用户DAO实例
 var UserDaoInstance = &UserDAO{&BaseDAO[model.User, int64]{}}
 
-// Create 创建用户
-//func (d *UserDAO) Create(session *xorm.Session, user *model.User) error {
-//	//_, err := session.Insert(user)
-//	//return err
-//	return d.BaseDAO.Create(session, user)
-//}
-
-//// GetByID 根据ID获取用户
-//func (d *UserDAO) GetByID(session *xorm.Session, id int64) (*model.User, error) {
-//	//var user model.User
-//	//has, err := session.ID(id).Get(&user)
-//	//if err != nil {
-//	//	return nil, err
-//	//}
-//	//if !has {
-//	//	return nil, errors.New("user not found")
-//	//}
-//	//return &user, nil
-//	return d.BaseDAO.GetByID(session, id)
-//}
+// CreateUser 创建用户
+func (d *UserDAO) CreateUser(session *xorm.Session, user *model.User) error {
+	// 检查邮箱是否已存在
+	exist, err := d.ExistByEmail(session, user.Email)
+	if err != nil {
+		return err
+	}
+	if exist {
+		return errors.New("email already exists")
+	}
+	return d.BaseDAO.Insert(session, user)
+}
 
 // GetByEmail 根据邮箱获取用户
 func (d *UserDAO) GetByEmail(session *xorm.Session, email string) (*model.User, error) {
@@ -50,18 +42,37 @@ func (d *UserDAO) GetByEmail(session *xorm.Session, email string) (*model.User, 
 }
 
 // Update 更新用户
-//func (d *UserDAO) Update(session *xorm.Session, user *model.User) error {
-//	//_, err := session.ID(user.ID).Update(user)
-//	//return err
-//	return d.BaseDAO.Update(session, user)
-//}
+func (d *UserDAO) Update(session *xorm.Session, user *model.User) error {
+	//检查用户是否存在
+	existing, err := d.GetByID(session, user.ID)
+	if err != nil {
+		return err
+	}
+	// 如果邮箱有变更，检查新邮箱是否被其他用户使用
+	if user.Email != existing.Email {
+		exist, err := d.ExistByEmail(session, user.Email)
+		if err != nil {
+			return err
+		}
+		if exist {
+			return errors.New("email already used by another user")
+		}
+	}
+	return d.BaseDAO.UpdateById(session, user.ID, user)
+}
+
+// ExistByEmail 检查邮箱是否存在
+func (d *UserDAO) ExistByEmail(session *xorm.Session, email string) (bool, error) {
+	return session.Where("email = ?", email).Exist(&model.User{})
+}
+
 //
-//// Delete 删除用户
-//func (d *UserDAO) Delete(session *xorm.Session, id int64) error {
+//// DeleteById 删除用户
+//func (d *UserDAO) DeleteById(session *xorm.Session, id int64) error {
 //	//user := &model.User{ID: id}
-//	//_, err := session.ID(id).Delete(user)
+//	//_, err := session.ID(id).DeleteById(user)
 //	//return err
-//	return d.BaseDAO.Delete(session, id)
+//	return d.BaseDAO.DeleteById(session, id)
 //}
 
 // List 用户列表
@@ -72,8 +83,3 @@ func (d *UserDAO) GetByEmail(session *xorm.Session, email string) (*model.User, 
 //
 //	return d.BaseDAO.PageList(session, param)
 //}
-
-// ExistByEmail 检查邮箱是否存在
-func (d *UserDAO) ExistByEmail(session *xorm.Session, email string) (bool, error) {
-	return session.Where("email = ?", email).Exist(&model.User{})
-}

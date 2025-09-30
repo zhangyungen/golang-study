@@ -13,7 +13,7 @@ func WithLimit(parent context.Context, limit int) (context.Context, context.Canc
 	// Use a buffered channel with the limit as its capacity
 	sem := make(chan struct{}, limit)
 
-	// Create a new context with a cancellation function
+	// CreateUser a new context with a cancellation function
 	ctx, cancel := context.WithCancel(parent)
 
 	// Replace the value of the key with the semaphore

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"xorm.io/xorm"
 	"zyj.com/golang-study/xorm/common"
-	"zyj.com/golang-study/xorm/model"
 )
 
 // BaseDAO 基础DAO
@@ -16,42 +15,47 @@ type BaseDAO[T any, K any] struct{}
 
 // GetByID 根据ID获取用户
 func (d *BaseDAO[T, K]) GetByID(session *xorm.Session, id K) (*T, error) {
-	var user T
-	has, err := session.ID(id).Get(&user)
+	var entity T
+	has, err := session.ID(id).Get(&entity)
 	if err != nil {
 		return nil, err
 	}
 	if !has {
-		return nil, errors.New("user not found")
+		return nil, errors.New("entity not found")
 	}
-	return &user, nil
+	return &entity, nil
 }
 
 // Update 更新用户
-func (d *BaseDAO[T, K]) UpdateById(session *xorm.Session, id K, user *T) error {
-	_, err := session.ID(id).Update(user)
+func (d *BaseDAO[T, K]) UpdateById(session *xorm.Session, id K, entity *T) error {
+	_, err := session.ID(id).Update(entity)
 	return err
 }
 
-// Delete 删除用户
-func (d *BaseDAO[T, K]) Delete(session *xorm.Session, id int64) error {
-	user := &model.User{ID: id}
-	_, err := session.ID(id).Delete(user)
+// DeleteById 删除用户
+func (d *BaseDAO[T, K]) DeleteById(session *xorm.Session, id int64, entity *T) error {
+	_, err := session.ID(id).Delete(entity)
 	return err
 }
 
-func (d *BaseDAO[T, K]) Create(session *xorm.Session, user *T) error {
-	_, err := session.Insert(user)
+func (d *BaseDAO[T, K]) Insert(session *xorm.Session, entity *T) error {
+	_, err := session.Insert(entity)
 	return err
 }
 
 func (d *BaseDAO[T, K]) PageList(session *xorm.Session, param *common.PageParam) ([]*T, error) {
-	var users []*T
-	err := session.Limit(param.PageSize, param.PageSize*(param.Page-1)).Find(&users)
-	return users, err
+	if param.Page <= 0 {
+		param.Page = 1
+	}
+	if param.PageSize <= 0 {
+		param.PageSize = 10
+	}
+	var entitys []*T
+	err := session.Limit(param.PageSize, param.PageSize*(param.Page-1)).Find(&entitys)
+	return entitys, err
 }
 
 // Count 统计数量
-func (d *BaseDAO[T, k]) Count(session *xorm.Session) (int64, error) {
-	return session.Count(&model.User{})
+func (d *BaseDAO[T, k]) Count(session *xorm.Session, entity *T) (int64, error) {
+	return session.Count(entity)
 }

@@ -28,15 +28,7 @@ func (s *UserService) CreateUser(user *model.User) error {
 	}
 	session := s.getDBSession()
 	defer s.closeDBSession(session)
-	// 检查邮箱是否已存在
-	exist, err := s.userDAO.ExistByEmail(session, user.Email)
-	if err != nil {
-		return err
-	}
-	if exist {
-		return errors.New("email already exists")
-	}
-	return s.userDAO.Create(session, user)
+	return s.userDAO.CreateUser(session, user)
 }
 
 // GetUser 获取用户
@@ -66,32 +58,17 @@ func (s *UserService) UpdateUser(user *model.User) error {
 	}
 	session := s.getDBSession()
 	defer s.closeDBSession(session)
-	//检查用户是否存在
-	existing, err := s.userDAO.GetByID(session, user.ID)
-	if err != nil {
-		return err
-	}
-	// 如果邮箱有变更，检查新邮箱是否被其他用户使用
-	if user.Email != existing.Email {
-		exist, err := s.userDAO.ExistByEmail(session, user.Email)
-		if err != nil {
-			return err
-		}
-		if exist {
-			return errors.New("email already used by another user")
-		}
-	}
-	return s.userDAO.UpdateById(session, user.ID, user)
+	return s.userDAO.Update(session, user)
 }
 
 // DeleteUser 删除用户
-func (s *UserService) DeleteUser(id int64) error {
+func (s *UserService) DeleteUserById(id int64) error {
 	if id <= 0 {
 		return errors.New("invalid user id")
 	}
 	session := s.getDBSession()
 	defer s.closeDBSession(session)
-	return s.userDAO.Delete(session, id)
+	return s.userDAO.DeleteById(session, id, &model.User{})
 }
 
 // ListUsers 用户列表

@@ -17,7 +17,7 @@ type BaseService[T any, K any] struct {
 
 // GetDBSession 获取数据库会话
 func (b BaseService[T, K]) getDBSession() *xorm.Session {
-	return database.NewSession()
+	return database.GetDBSession()
 }
 
 func (b BaseService[T, K]) closeDBSession(session *xorm.Session) {
