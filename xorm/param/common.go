@@ -1,4 +1,4 @@
-package common
+package param
 
 type PageParam struct {
 	Page       int    `json:"page" form:"page"`

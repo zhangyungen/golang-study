@@ -33,7 +33,6 @@ func Init(driver, dsn string) error {
 		engine.SetMaxOpenConns(100)
 		engine.SetMaxIdleConns(10)
 		engine.SetConnMaxLifetime(time.Hour)
-
 		// 显示SQL日志（开发环境）
 		engine.ShowSQL(true)
 

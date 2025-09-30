@@ -3,9 +3,9 @@ package service
 
 import (
 	"errors"
-	"zyj.com/golang-study/xorm/common"
 	"zyj.com/golang-study/xorm/dao"
 	"zyj.com/golang-study/xorm/model"
+	"zyj.com/golang-study/xorm/param"
 )
 
 // UserService 用户Service
@@ -15,7 +15,7 @@ type UserService struct {
 }
 
 // 全局用户Service实例
-var UserServiceInstance = &UserService{&BaseService[model.User, int64]{}, dao.UserDaoInstance}
+var UserServiceIns = &UserService{&BaseService[model.User, int64]{}, dao.UserDaoInstance}
 
 // CreateUser 创建用户
 func (s *UserService) CreateUser(user *model.User) error {
@@ -72,7 +72,7 @@ func (s *UserService) DeleteUserById(id int64) error {
 }
 
 // ListUsers 用户列表
-func (s *UserService) PageList(param *common.PageParam) ([]*model.User, error) {
+func (s *UserService) PageList(param *param.PageParam) ([]*model.User, error) {
 	if param.Page <= 0 {
 		param.Page = 1
 	}

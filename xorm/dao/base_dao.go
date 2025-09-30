@@ -4,7 +4,7 @@ package dao
 import (
 	"errors"
 	"xorm.io/xorm"
-	"zyj.com/golang-study/xorm/common"
+	"zyj.com/golang-study/xorm/param"
 )
 
 // BaseDAO 基础DAO
@@ -43,7 +43,7 @@ func (d *BaseDAO[T, K]) Insert(session *xorm.Session, entity *T) error {
 	return err
 }
 
-func (d *BaseDAO[T, K]) PageList(session *xorm.Session, param *common.PageParam) ([]*T, error) {
+func (d *BaseDAO[T, K]) PageList(session *xorm.Session, param *param.PageParam) ([]*T, error) {
 	if param.Page <= 0 {
 		param.Page = 1
 	}
