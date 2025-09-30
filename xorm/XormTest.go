@@ -18,12 +18,12 @@ func main() {
 	//database.GetEngine().Sync2(new(model.User))
 
 	//业务代码开始
-	err = biz.UserCmdBizIns.CreateUser(&param.UserCreate{Name: "zyj2fdsa", Email: "zyj3@163kkkk.com"})
+	err = biz.UserCmdBizIns.CreateUser(&param.UserCreate{Name: "zyj2fdsa", Email: "zyj10@163kkkk.com"})
 	if err != nil {
 		log.Println(err)
 	}
 
-	err = biz.UserCmdBizIns.UpdateUser(&model.User{ID: 4, Name: "4name"})
+	err = biz.UserCmdBizIns.UpdateUser(&model.User{Id: 4, Name: "4name"})
 	if err != nil {
 		log.Println(err)
 	}

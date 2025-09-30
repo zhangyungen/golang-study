@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	id := goid.Get() // 直接获取当前 goroutine 的 ID
-	fmt.Printf("Current goroutine ID:    %d\n", id)
+	id := goid.Get() // 直接获取当前 goroutine 的 Id
+	fmt.Printf("Current goroutine Id:    %d\n", id)
 
 }

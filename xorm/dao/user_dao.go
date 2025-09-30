@@ -13,7 +13,7 @@ type UserDAO struct {
 }
 
 // 全局用户DAO实例
-var UserDaoInstance = &UserDAO{&BaseDAO[model.User, int64]{}}
+var UserDaoIns = &UserDAO{&BaseDAO[model.User, int64]{}}
 
 // CreateUser 创建用户
 func (d *UserDAO) CreateUser(session *xorm.Session, user *model.User) error {
@@ -44,7 +44,7 @@ func (d *UserDAO) GetByEmail(session *xorm.Session, email string) (*model.User, 
 // Update 更新用户
 func (d *UserDAO) Update(session *xorm.Session, user *model.User) error {
 	//检查用户是否存在
-	existing, err := d.GetByID(session, user.ID)
+	existing, err := d.GetByID(session, user.Id)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (d *UserDAO) Update(session *xorm.Session, user *model.User) error {
 			return errors.New("email already used by another user")
 		}
 	}
-	return d.BaseDAO.UpdateById(session, user.ID, user)
+	return d.BaseDAO.UpdateById(session, user.Id, user)
 }
 
 // ExistByEmail 检查邮箱是否存在
@@ -69,8 +69,8 @@ func (d *UserDAO) ExistByEmail(session *xorm.Session, email string) (bool, error
 //
 //// DeleteById 删除用户
 //func (d *UserDAO) DeleteById(session *xorm.Session, id int64) error {
-//	//user := &model.User{ID: id}
-//	//_, err := session.ID(id).DeleteById(user)
+//	//user := &model.User{Id: id}
+//	//_, err := session.Id(id).DeleteById(user)
 //	//return err
 //	return d.BaseDAO.DeleteById(session, id)
 //}

@@ -6,8 +6,7 @@ source:
 targets:
   - type: codes
     include_tables: # tables included, you can use **
-      - a
-      - b
+      - user_login_log
     exclude_tables: # tables excluded, you can use **
       - c
     table_mapper: snake # how table name map to class or struct name
@@ -17,21 +16,21 @@ targets:
     language: golang
     template: | # template for code file, it has higher perior than template_path
       package models
-      
+
       {{$ilen := len .Imports}}
       {{if gt $ilen 0}}
       import (
         {{range .Imports}}"{{.}}"{{end}}
       )
       {{end}}
-      
+
       {{range .Tables}}
       type {{TableMapper .Name}} struct {
       {{$table := .}}
       {{range .ColumnsSeq}}{{$col := $table.GetColumn .}}	{{ColumnMapper $col.Name}}	{{Type $col}} `{{Tag $table $col}}`
       {{end}}
       }
-      
+
       func (m *{{TableMapper .Name}}) TableName() string {
       	return "{{$table.Name}}"
       }

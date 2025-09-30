@@ -3,6 +3,7 @@ package biz
 
 import (
 	"errors"
+	"time"
 	"zyj.com/golang-study/xorm/dao"
 	"zyj.com/golang-study/xorm/model"
 	"zyj.com/golang-study/xorm/param"
@@ -12,11 +13,15 @@ import (
 // UserService 用户Service
 type UserQueryBiz struct {
 	*service.BaseService[model.User, int64]
-	userDAO *dao.UserDAO
+	userLoginLogService *service.UserLoginLogService
+	userDAO             *dao.UserDAO
+	userLoginLogDAO     *dao.UserLoginLogDAO
 }
 
 // 全局UserQueryBizIns实例
-var UserQueryBizIns = &UserQueryBiz{&service.BaseService[model.User, int64]{}, dao.UserDaoInstance}
+var UserQueryBizIns = &UserQueryBiz{BaseService: &service.BaseService[model.User, int64]{},
+	userDAO: dao.UserDaoIns, userLoginLogDAO: dao.UserLoginLogDaoIns,
+	userLoginLogService: service.UserLoginLogServiceIns}
 
 // LogIn 登录
 func (biz *UserQueryBiz) LogIn(param *param.UserLogin) (bool, error) {
@@ -26,6 +31,14 @@ func (biz *UserQueryBiz) LogIn(param *param.UserLogin) (bool, error) {
 		if param.Pwd != user.Pwd {
 			return false, errors.New("用户名或密码错误")
 		} else {
+			biz.userLoginLogService.Create(&model.UserLoginLog{
+				LoginIp:     "192.168.1.1",
+				LoginTime:   time.Time{},
+				UserId:      user.Id,
+				CreatedTime: time.Time{},
+				UpdatedTime: time.Time{},
+				DeletedTime: time.Time{},
+			})
 			return true, nil
 		}
 	} else {

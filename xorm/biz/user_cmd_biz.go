@@ -18,9 +18,6 @@ var UserCmdBizIns = &UserCmdBiz{BaseCmdBizIns, service.UserServiceIns}
 // CreateUser 创建用户
 func (biz *UserCmdBiz) CreateUser(user *param.UserCreate) error {
 	return biz.ExecuteTx(func() error {
-		if err := service.UserServiceIns.ValidateUser(user.Email, user.Name); err != nil {
-			return err
-		}
 		return service.UserServiceIns.CreateUser(param.ConvertToModel(user))
 	})
 }

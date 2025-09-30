@@ -12,9 +12,10 @@ import (
 )
 
 var (
-	engine     *xorm.Engine
-	once       sync.Once
-	sessionMap = make(map[int64]*xorm.Session, 10)
+	engine      *xorm.Engine
+	once        sync.Once
+	sessionMap  = make(map[int64]*xorm.Session, 10)
+	transaction = make(map[int64]bool, 10)
 )
 
 // Init 初始化数据库连接
@@ -67,7 +68,7 @@ func CloseEngine() error {
 
 // getDBSession 创建新的数据库会话
 func GetDBSession() *xorm.Session {
-	id := goid.Get() // 直接获取当前 goroutine 的 ID
+	id := goid.Get() // 直接获取当前 goroutine 的 Id
 	if sessionMap[id] != nil {
 		return sessionMap[id]
 	}
@@ -77,7 +78,7 @@ func GetDBSession() *xorm.Session {
 
 // CloseSession 关闭数据库回话
 func CloseSession(session *xorm.Session) error {
-	id := goid.Get() // 直接获取当前 goroutine 的 ID
+	id := goid.Get() // 直接获取当前 goroutine 的 Id
 	if session == nil {
 		return errors.New("argument session is nil ,don't close ")
 	}
@@ -92,11 +93,18 @@ func CloseSession(session *xorm.Session) error {
 	return nil
 }
 
-func WithTransaction(fn func() error) error {
+func WithTransaction(fn func() (err error)) (err error) {
 	session := GetDBSession()
-	defer CloseSession(session)
-	if err := session.Begin(); err != nil {
-		return err
+	defer func(session *xorm.Session) {
+		err := CloseSession(session)
+		if err != nil {
+			log.Println("close session failed:", err)
+		}
+	}(session)
+	if !session.IsInTx() {
+		if err := session.Begin(); err != nil {
+			return err
+		}
 	}
 	if err := fn(); err != nil {
 		_ = session.Rollback()

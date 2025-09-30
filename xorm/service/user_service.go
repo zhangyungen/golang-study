@@ -15,7 +15,7 @@ type UserService struct {
 }
 
 // 全局用户Service实例
-var UserServiceIns = &UserService{&BaseService[model.User, int64]{}, dao.UserDaoInstance}
+var UserServiceIns = &UserService{&BaseService[model.User, int64]{}, dao.UserDaoIns}
 
 // CreateUser 创建用户
 func (s *UserService) CreateUser(user *model.User) error {
@@ -53,7 +53,7 @@ func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
 
 // UpdateUser 更新用户
 func (s *UserService) UpdateUser(user *model.User) error {
-	if user.ID <= 0 {
+	if user.Id <= 0 {
 		return errors.New("invalid user id")
 	}
 	session := s.getDBSession()
