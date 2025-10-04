@@ -6,15 +6,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/petermattis/goid"
 	"log"
+	"reflect"
 	"sync"
 	"time"
 	"xorm.io/xorm"
 )
 
 var (
-	engine     *xorm.Engine
-	once       sync.Once
-	sessionMap = make(map[int64]*xorm.Session, 10)
+	engine        *xorm.Engine
+	once          sync.Once
+	sessionMap    = make(map[int64]*xorm.Session, 1)
+	idKeyTableMap = make(map[interface{}]string, 1)
 )
 
 // Init 初始化数据库连接
@@ -112,4 +114,27 @@ func WithTransaction(fn func() (err error)) (err error) {
 		return err
 	}
 	return session.Commit()
+}
+
+func GetPrimaryKey[T any]() (string, error) {
+	var t T
+	r := reflect.TypeOf(t)
+	typeString := r.PkgPath() + "." + r.Name()
+	if idKeyTableMap[typeString] != "" {
+		return idKeyTableMap[typeString], nil
+	}
+	engine := getEngine()
+	//tableName := engine.TableName(model, true)
+	table, err := engine.TableInfo(t)
+	if err != nil {
+		return "", err
+	}
+
+	for _, col := range table.Columns() {
+		if col.IsPrimaryKey {
+			idKeyTableMap[typeString] = col.Name
+			return col.Name, nil
+		}
+	}
+	return "", errors.New("no primary key found")
 }

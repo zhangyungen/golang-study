@@ -4,16 +4,17 @@ package dao
 import (
 	"errors"
 	"xorm.io/xorm"
+	"zyj.com/golang-study/xorm/base"
 	"zyj.com/golang-study/xorm/model"
 )
 
 // UserDAO 用户DAO
 type UserDAO struct {
-	*BaseDAO[model.User, int64]
+	*base.BaseDAO[model.User, int64]
 }
 
 // 全局用户DAO实例
-var UserDaoIns = &UserDAO{&BaseDAO[model.User, int64]{}}
+var UserDaoIns = &UserDAO{&base.BaseDAO[model.User, int64]{}}
 
 // CreateUser 创建用户
 func (ud *UserDAO) CreateUser(session *xorm.Session, user *model.User) error {

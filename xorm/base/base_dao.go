@@ -1,14 +1,17 @@
 // dao/base_dao.go
-package dao
+package base
 
 import (
 	"errors"
 	"xorm.io/xorm"
+	"zyj.com/golang-study/xorm/base/database"
 	"zyj.com/golang-study/xorm/param"
+	"zyj.com/golang-study/xorm/result"
 )
 
 // BaseDAO 基础DAO
-type BaseDAO[T any, K any] struct{}
+type BaseDAO[T any, K any] struct {
+}
 
 // 全局基础DAO实例
 //var BaseDaoInstance = &BaseDAO{}
@@ -43,19 +46,31 @@ func (bd *BaseDAO[T, K]) Insert(session *xorm.Session, entity *T) error {
 	return err
 }
 
-func (bd *BaseDAO[T, K]) PageList(session *xorm.Session, param *param.PageParam) ([]T, error) {
+func (bd *BaseDAO[T, K]) PageList(session *xorm.Session, param *param.PageParam) (result.PageVO[T], error) {
 	if param.Page <= 0 {
 		param.Page = 1
 	}
 	if param.PageSize <= 0 {
 		param.PageSize = 10
 	}
-	var entitys []T
-	err := session.Limit(param.PageSize, param.PageSize*(param.Page-1)).Find(&entitys)
-	return entitys, err
+	var entities []T
+	err := session.Limit(param.PageSize, param.PageSize*(param.Page-1)).Find(&entities)
+	var t T
+	count, err := session.Count(t)
+	if err != nil {
+		return result.PageVO[T]{}, err
+	}
+	return result.Convert2PageVO[T](param, count, entities), nil
 }
 
 // Count 统计数量
 func (bd *BaseDAO[T, k]) Count(session *xorm.Session, entity *T) (int64, error) {
 	return session.Count(entity)
+}
+
+func (bd *BaseDAO[T, K]) ListByIds(session *xorm.Session, ids []K) ([]T, error) {
+	var entities []T
+	key, err := database.GetPrimaryKey[T]()
+	err = session.In(key, ids).Find(&entities)
+	return entities, err
 }

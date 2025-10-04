@@ -4,9 +4,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"zyj.com/golang-study/util/obj"
+	"zyj.com/golang-study/xorm/base/database"
 	"zyj.com/golang-study/xorm/biz"
-	"zyj.com/golang-study/xorm/database"
 	"zyj.com/golang-study/xorm/param"
+	"zyj.com/golang-study/xorm/service"
 )
 
 func main() {
@@ -25,11 +26,13 @@ func main() {
 	}
 
 	err = biz.UserCmdBizIns.UpdateUser(&param.UserUpdate{Id: 1, Name: "zyj2fdsa", Email: "zyj000@163kkkk.com"})
+
 	if err != nil {
 		log.Println(err)
 	}
 
 	in, err := biz.UserQueryBizIns.LogIn(&param.UserLogin{Email: "zyj@163fff.com", Pwd: "123456"})
+
 	if err != nil {
 		log.Println(err)
 	} else {
@@ -42,6 +45,17 @@ func main() {
 	} else {
 		log.Println("分页查询结果", obj.ObjToJsonStr(pages))
 	}
+
+	entities, err := service.UserServiceIns.ListByIds([]int64{1, 2, 3})
+	entities2, err := service.UserServiceIns.ListByIds([]int64{1, 2, 3})
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Println("列表查询结果", obj.ObjToJsonStr(entities))
+		log.Println("列表查询结果", obj.ObjToJsonStr(entities2))
+
+	}
+
 	//业务代码结束
 
 	log.Printf("after biz")

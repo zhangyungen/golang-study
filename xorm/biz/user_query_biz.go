@@ -4,24 +4,20 @@ package biz
 import (
 	"errors"
 	"time"
-	"zyj.com/golang-study/xorm/dao"
 	"zyj.com/golang-study/xorm/model"
 	"zyj.com/golang-study/xorm/param"
 	"zyj.com/golang-study/xorm/result"
 	"zyj.com/golang-study/xorm/service"
 )
 
-// UserService 用户Service
+// UserQueryBiz 用户QueryBizService
 type UserQueryBiz struct {
 	userService         *service.UserService
 	userLoginLogService *service.UserLoginLogService
-	userDAO             *dao.UserDAO
-	userLoginLogDAO     *dao.UserLoginLogDAO
 }
 
 // 全局UserQueryBizIns实例
 var UserQueryBizIns = &UserQueryBiz{userService: service.UserServiceIns,
-	userDAO: dao.UserDaoIns, userLoginLogDAO: dao.UserLoginLogDaoIns,
 	userLoginLogService: service.UserLoginLogServiceIns}
 
 func (biz *UserQueryBiz) PageListUser(param *param.PageParam) (result.PageVO[model.User], error) {
