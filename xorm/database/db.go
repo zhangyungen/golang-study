@@ -75,8 +75,8 @@ func GetDBSession() *xorm.Session {
 	return sessionMap[id]
 }
 
-// CloseSession 关闭数据库回话
-func CloseSession(session *xorm.Session) error {
+// ReturnSession 关闭数据库回话
+func ReturnSession(session *xorm.Session) error {
 	id := goid.Get() // 直接获取当前 goroutine 的 Id
 	if session == nil {
 		return errors.New("argument session is nil ,don't close ")
@@ -97,7 +97,7 @@ func CloseSession(session *xorm.Session) error {
 func WithTransaction(fn func() (err error)) (err error) {
 	session := GetDBSession()
 	defer func(session *xorm.Session) {
-		err := CloseSession(session)
+		err := ReturnSession(session)
 		if err != nil {
 			log.Println("close session failed:", err)
 		}

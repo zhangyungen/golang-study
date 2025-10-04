@@ -22,7 +22,7 @@ func (b BaseService[T, K]) getDBSession() *xorm.Session {
 }
 
 func (b BaseService[T, K]) closeDBSession(session *xorm.Session) {
-	database.CloseSession(session)
+	database.ReturnSession(session)
 }
 
 // GetByID 根据ID获取实体
