@@ -12,6 +12,15 @@ type UserCreate struct {
 	Age   int    `json:"age" form:"age"`
 }
 
+type UserUpdate struct {
+	Id     int64  ` json:"id"`
+	Name   string ` json:"name"`
+	Email  string ` json:"email"`
+	Age    int    ` json:"age"`
+	Pwd    string `json:"pwd"`
+	Status int    ` json:"status"`
+}
+
 type UserLogin struct {
 	Email string `json:"email" form:"email"`
 	Pwd   string `json:"pwd" form:"pwd"`

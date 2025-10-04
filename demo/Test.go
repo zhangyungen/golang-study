@@ -51,9 +51,8 @@ const (
 
 func main() {
 
-	var param2 = result.PageVO[model.User]{}
 	var param1 = param.PageParam{Page: 1, PageSize: 10}
-	obj.ObjToObj(&param1, &param2)
+	var param2 = obj.ObjToObj[result.PageVO[model.User]](&param1)
 	log.Println("param2 ObjToObj", obj.ObjToJsonStr(param2))
 
 	param1.PageSize = 1000
@@ -69,9 +68,8 @@ func main() {
 	param1Ptr := obj.MapToObj[param.PageParam](obj2Map)
 	log.Println("MapToObj", param1Ptr)
 
-	var param3 = result.PageVO[model.User]{}
 	json := obj.ObjToJsonStr(param1)
-	obj.JsonStrToObj(json, &param3)
+	var param3 = obj.JsonStrToObj[result.PageVO[model.User]](json)
 	log.Println("ObjToJsonStr param3", obj.ObjToJsonStr(&param3))
 
 	//

@@ -2,6 +2,7 @@ package obj
 
 import (
 	"encoding/json"
+	"github.com/jinzhu/copier"
 	"github.com/mitchellh/mapstructure"
 	"log"
 	"reflect"
@@ -18,7 +19,8 @@ func ObjToJsonStr(obj interface{}) string {
 }
 
 // JsonStrToObj 字符串转对象
-func JsonStrToObj(str string, obj interface{}) interface{} {
+func JsonStrToObj[T any](str string) *T {
+	obj := new(T)
 	err := json.Unmarshal([]byte(str), obj)
 	if err != nil {
 		log.Printf("JsonStrToObj", err)
@@ -34,12 +36,13 @@ func JsonStrToObj(str string, obj interface{}) interface{} {
  * @param s 源对象
  * @param t 目标对象
  */
-func ObjToObj(s interface{}, t interface{}) interface{} {
-	err := mapstructure.Decode(s, t)
+func ObjToObj[T any](s interface{}) *T {
+	var t T
+	err := copier.Copy(&t, s)
 	if err != nil {
 		log.Printf("ObjToObj", err)
 	}
-	return t
+	return &t
 }
 
 //func CopierObj(s interface{}, t interface{}) interface{} {

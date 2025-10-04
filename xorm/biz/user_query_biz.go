@@ -13,24 +13,24 @@ import (
 
 // UserService 用户Service
 type UserQueryBiz struct {
-	*service.UserService
+	userService         *service.UserService
 	userLoginLogService *service.UserLoginLogService
 	userDAO             *dao.UserDAO
 	userLoginLogDAO     *dao.UserLoginLogDAO
 }
 
 // 全局UserQueryBizIns实例
-var UserQueryBizIns = &UserQueryBiz{UserService: service.UserServiceIns,
+var UserQueryBizIns = &UserQueryBiz{userService: service.UserServiceIns,
 	userDAO: dao.UserDaoIns, userLoginLogDAO: dao.UserLoginLogDaoIns,
 	userLoginLogService: service.UserLoginLogServiceIns}
 
 func (biz *UserQueryBiz) PageListUser(param *param.PageParam) (result.PageVO[model.User], error) {
-	return biz.PageList(param)
+	return biz.userService.PageList(param)
 }
 
 // LogIn 登录
 func (biz *UserQueryBiz) LogIn(param *param.UserLogin) (bool, error) {
-	if user, err := service.UserServiceIns.GetUserByEmail(param.Email); err != nil {
+	if user, err := biz.userService.GetUserByEmail(param.Email); err != nil {
 		return false, err
 	} else if user != nil {
 		if param.Pwd != user.Pwd {

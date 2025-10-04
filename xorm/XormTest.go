@@ -6,7 +6,6 @@ import (
 	"zyj.com/golang-study/util/obj"
 	"zyj.com/golang-study/xorm/biz"
 	"zyj.com/golang-study/xorm/database"
-	"zyj.com/golang-study/xorm/model"
 	"zyj.com/golang-study/xorm/param"
 )
 
@@ -20,11 +19,12 @@ func main() {
 
 	//业务代码开始
 	err = biz.UserCmdBizIns.CreateUser(&param.UserCreate{Name: "zyj2fdsa", Email: "zyj000@163kkkk.com"})
+
 	if err != nil {
 		log.Println("error", err)
 	}
 
-	err = biz.UserCmdBizIns.UpdateUser(&model.User{Id: 4, Name: "4name"})
+	err = biz.UserCmdBizIns.UpdateUser(&param.UserUpdate{Id: 1, Name: "zyj2fdsa", Email: "zyj000@163kkkk.com"})
 	if err != nil {
 		log.Println(err)
 	}

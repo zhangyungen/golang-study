@@ -14,7 +14,7 @@ type BaseDAO[T any, K any] struct{}
 //var BaseDaoInstance = &BaseDAO{}
 
 // GetByID 根据ID获取用户
-func (d *BaseDAO[T, K]) GetByID(session *xorm.Session, id K) (*T, error) {
+func (bd *BaseDAO[T, K]) GetByID(session *xorm.Session, id K) (*T, error) {
 	var entity T
 	has, err := session.ID(id).Get(&entity)
 	if err != nil {
@@ -27,23 +27,23 @@ func (d *BaseDAO[T, K]) GetByID(session *xorm.Session, id K) (*T, error) {
 }
 
 // Update 更新用户
-func (d *BaseDAO[T, K]) UpdateById(session *xorm.Session, id K, entity *T) error {
+func (bd *BaseDAO[T, K]) UpdateById(session *xorm.Session, id K, entity *T) error {
 	_, err := session.ID(id).Update(entity)
 	return err
 }
 
 // DeleteById 删除用户
-func (d *BaseDAO[T, K]) DeleteById(session *xorm.Session, id int64, entity *T) error {
+func (bd *BaseDAO[T, K]) DeleteById(session *xorm.Session, id int64, entity *T) error {
 	_, err := session.ID(id).Delete(entity)
 	return err
 }
 
-func (d *BaseDAO[T, K]) Insert(session *xorm.Session, entity *T) error {
+func (bd *BaseDAO[T, K]) Insert(session *xorm.Session, entity *T) error {
 	_, err := session.Insert(entity)
 	return err
 }
 
-func (d *BaseDAO[T, K]) PageList(session *xorm.Session, param *param.PageParam) ([]T, error) {
+func (bd *BaseDAO[T, K]) PageList(session *xorm.Session, param *param.PageParam) ([]T, error) {
 	if param.Page <= 0 {
 		param.Page = 1
 	}
@@ -56,6 +56,6 @@ func (d *BaseDAO[T, K]) PageList(session *xorm.Session, param *param.PageParam) 
 }
 
 // Count 统计数量
-func (d *BaseDAO[T, k]) Count(session *xorm.Session, entity *T) (int64, error) {
+func (bd *BaseDAO[T, k]) Count(session *xorm.Session, entity *T) (int64, error) {
 	return session.Count(entity)
 }

@@ -16,20 +16,20 @@ type UserDAO struct {
 var UserDaoIns = &UserDAO{&BaseDAO[model.User, int64]{}}
 
 // CreateUser 创建用户
-func (d *UserDAO) CreateUser(session *xorm.Session, user *model.User) error {
+func (ud *UserDAO) CreateUser(session *xorm.Session, user *model.User) error {
 	// 检查邮箱是否已存在
-	exist, err := d.ExistByEmail(session, user.Email)
+	exist, err := ud.ExistByEmail(session, user.Email)
 	if err != nil {
 		return err
 	}
 	if exist {
 		return errors.New("email already exists")
 	}
-	return d.BaseDAO.Insert(session, user)
+	return ud.BaseDAO.Insert(session, user)
 }
 
 // GetByEmail 根据邮箱获取用户
-func (d *UserDAO) GetByEmail(session *xorm.Session, email string) (*model.User, error) {
+func (ud *UserDAO) GetByEmail(session *xorm.Session, email string) (*model.User, error) {
 	var user model.User
 	has, err := session.Where("email = ?", email).Get(&user)
 	if err != nil {
@@ -42,15 +42,15 @@ func (d *UserDAO) GetByEmail(session *xorm.Session, email string) (*model.User, 
 }
 
 // Update 更新用户
-func (d *UserDAO) Update(session *xorm.Session, user *model.User) error {
+func (ud *UserDAO) Update(session *xorm.Session, user *model.User) error {
 	//检查用户是否存在
-	existing, err := d.GetByID(session, user.Id)
+	existing, err := ud.GetByID(session, user.Id)
 	if err != nil {
 		return err
 	}
 	// 如果邮箱有变更，检查新邮箱是否被其他用户使用
 	if user.Email != existing.Email {
-		exist, err := d.ExistByEmail(session, user.Email)
+		exist, err := ud.ExistByEmailAndNotId(session, user)
 		if err != nil {
 			return err
 		}
@@ -58,12 +58,17 @@ func (d *UserDAO) Update(session *xorm.Session, user *model.User) error {
 			return errors.New("email already used by another user")
 		}
 	}
-	return d.BaseDAO.UpdateById(session, user.Id, user)
+	return ud.BaseDAO.UpdateById(session, user.Id, user)
 }
 
 // ExistByEmail 检查邮箱是否存在
-func (d *UserDAO) ExistByEmail(session *xorm.Session, email string) (bool, error) {
+func (ud *UserDAO) ExistByEmail(session *xorm.Session, email string) (bool, error) {
 	return session.Where("email = ?", email).Exist(&model.User{})
+}
+
+// ExistByEmail 检查邮箱是否存在
+func (ud *UserDAO) ExistByEmailAndNotId(session *xorm.Session, user *model.User) (bool, error) {
+	return session.Where("email = ? and id != ?", user.Email, user.Id).Exist(&model.User{})
 }
 
 //
