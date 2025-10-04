@@ -1,4 +1,3 @@
-// common/database/db.go
 package database
 
 import (
@@ -16,7 +15,7 @@ var (
 	engine        *xorm.Engine
 	once          sync.Once
 	sessionMap    = make(map[int64]*xorm.Session, 1)
-	idKeyTableMap = make(map[interface{}]string, 1)
+	idKeyTableMap = make(map[string]string, 1)
 )
 
 // Init 初始化数据库连接

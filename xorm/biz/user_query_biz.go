@@ -1,4 +1,3 @@
-// service/user_service.go
 package biz
 
 import (
@@ -20,7 +19,7 @@ type UserQueryBiz struct {
 var UserQueryBizIns = &UserQueryBiz{userService: service.UserServiceIns,
 	userLoginLogService: service.UserLoginLogServiceIns}
 
-func (biz *UserQueryBiz) PageListUser(param *param.PageParam) (result.PageVO[model.User], error) {
+func (biz *UserQueryBiz) PageUser(param *param.PageParam) (result.PageVO[model.User], error) {
 	return biz.userService.Page(param)
 }
 

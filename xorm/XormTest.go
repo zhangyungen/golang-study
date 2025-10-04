@@ -38,7 +38,7 @@ func main() {
 		log.Println("登录状态 %v", in)
 	}
 
-	pages, err := biz.UserQueryBizIns.PageListUser(&param.PageParam{Page: 1, PageSize: 10})
+	pages, err := biz.UserQueryBizIns.PageUser(&param.PageParam{Page: 1, PageSize: 10})
 	if err != nil {
 		log.Println(err)
 	} else {

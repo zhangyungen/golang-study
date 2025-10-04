@@ -14,7 +14,7 @@ type BaseService[T any, K any] struct {
 }
 
 // 全局基础Service实例
-//var BaseServiceInstance = &BaseService{ &dao.BaseDAO{}}
+//var BaseServiceInstance = &BaseService{ &BaseDAO{}}
 
 // GetDBSession 获取数据库会话
 func (bs BaseService[T, K]) GetDBSession() *xorm.Session {

@@ -1,4 +1,3 @@
-// service/user_service.go
 package base
 
 import "zyj.com/golang-study/xorm/base/database"

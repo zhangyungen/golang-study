@@ -1,4 +1,3 @@
-// service/user_service.go
 package biz
 
 import (
@@ -16,7 +15,8 @@ type UserCmdBiz struct {
 }
 
 // 全局UserCmdBizIns实例
-var UserCmdBizIns = &UserCmdBiz{base.BaseCmdBizIns, service.UserServiceIns}
+var UserCmdBizIns = &UserCmdBiz{base.BaseCmdBizIns,
+	service.UserServiceIns}
 
 // CreateUser 创建用户
 func (biz *UserCmdBiz) CreateUser(user *param.UserCreate) error {

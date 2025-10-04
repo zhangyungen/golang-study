@@ -17,7 +17,8 @@ type UserService struct {
 }
 
 // 全局用户Service实例
-var UserServiceIns = &UserService{&base.BaseService[model.User, int64]{}, dao.UserDaoIns}
+var UserServiceIns = &UserService{&base.BaseService[model.User, int64]{},
+	dao.UserDaoIns}
 
 // CreateUser 创建用户
 func (us *UserService) CreateUser(user *model.User) error {
