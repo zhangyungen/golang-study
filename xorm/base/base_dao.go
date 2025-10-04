@@ -46,7 +46,7 @@ func (bd *BaseDAO[T, K]) Insert(session *xorm.Session, entity *T) error {
 	return err
 }
 
-func (bd *BaseDAO[T, K]) PageList(session *xorm.Session, param *param.PageParam) (result.PageVO[T], error) {
+func (bd *BaseDAO[T, K]) Page(session *xorm.Session, param *param.PageParam) (result.PageVO[T], error) {
 	if param.Page <= 0 {
 		param.Page = 1
 	}

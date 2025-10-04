@@ -21,7 +21,7 @@ var UserQueryBizIns = &UserQueryBiz{userService: service.UserServiceIns,
 	userLoginLogService: service.UserLoginLogServiceIns}
 
 func (biz *UserQueryBiz) PageListUser(param *param.PageParam) (result.PageVO[model.User], error) {
-	return biz.userService.PageList(param)
+	return biz.userService.Page(param)
 }
 
 func (biz *UserQueryBiz) ListUserByIds(ids []int64) ([]model.User, error) {

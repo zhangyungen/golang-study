@@ -44,8 +44,8 @@ func (bs *BaseService[T, K]) Create(entity *T) error {
 	return bs.baseDAO.Insert(bs.GetDBSession(), entity)
 }
 
-func (bs *BaseService[T, K]) PageList(param *param.PageParam) (result.PageVO[T], error) {
-	return bs.baseDAO.PageList(bs.GetDBSession(), param)
+func (bs *BaseService[T, K]) Page(param *param.PageParam) (result.PageVO[T], error) {
+	return bs.baseDAO.Page(bs.GetDBSession(), param)
 }
 
 func (bs *BaseService[T, K]) ListByIds(ids []K) ([]T, error) {

@@ -82,10 +82,10 @@ func (ud *UserDAO) ExistByEmailAndNotId(session *xorm.Session, user *model.User)
 //}
 
 // List 用户列表
-//func (d *UserDAO) PageList(session *xorm.Session, param *common.PageParam) ([]*model.User, error) {
+//func (d *UserDAO) Page(session *xorm.Session, param *common.PageParam) ([]*model.User, error) {
 //	//var users []*model.User
 //	//err := session.Limit(param.PageSize, param.PageSize*(param.Page-1)).Find(&users)
 //	//return users, err
 //
-//	return d.BaseDAO.PageList(session, param)
+//	return d.BaseDAO.Page(session, param)
 //}

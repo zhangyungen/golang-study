@@ -85,7 +85,7 @@ func (us *UserService) PageListUser(param *param.PageParam) (result.PageVO[model
 	//session := us.getDBSession()
 	//defer us.closeDBSession(session)
 	//todo check and model biz
-	return us.PageList(param)
+	return us.Page(param)
 }
 
 // ValidateUser 验证用户数据
