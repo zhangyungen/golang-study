@@ -7,7 +7,6 @@ import (
 	"zyj.com/golang-study/xorm/base/database"
 	"zyj.com/golang-study/xorm/biz"
 	"zyj.com/golang-study/xorm/param"
-	"zyj.com/golang-study/xorm/service"
 )
 
 func main() {
@@ -46,14 +45,11 @@ func main() {
 		log.Println("分页查询结果", obj.ObjToJsonStr(pages))
 	}
 
-	entities, err := service.UserServiceIns.ListByIds([]int64{1, 2, 3})
-	entities2, err := service.UserServiceIns.ListByIds([]int64{1, 2, 3})
+	entities, err := biz.UserQueryBizIns.ListUserByIds([]int64{1, 2, 3})
 	if err != nil {
 		log.Println(err)
 	} else {
 		log.Println("列表查询结果", obj.ObjToJsonStr(entities))
-		log.Println("列表查询结果", obj.ObjToJsonStr(entities2))
-
 	}
 
 	//业务代码结束

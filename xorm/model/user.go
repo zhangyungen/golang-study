@@ -10,8 +10,8 @@ type User struct {
 	Age       int       `xorm:"'age' int" json:"age"`
 	Pwd       string    `xorm:"'pwd' varchar(255)" json:"pwd"`
 	Status    int       `xorm:"'status' int default 1" json:"status"`
-	CreatedAt time.Time `xorm:"'created_at' created" json:"created_at"`
-	UpdatedAt time.Time `xorm:"'updated_at' updated" json:"updated_at"`
+	CreatedAt time.Time `xorm:"'created_at' created" json:"createdAt"`
+	UpdatedAt time.Time `xorm:"'updated_at' updated" json:"updatedAt"`
 }
 
 func (User) TableName() string {

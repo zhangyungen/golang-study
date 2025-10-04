@@ -24,6 +24,10 @@ func (biz *UserQueryBiz) PageListUser(param *param.PageParam) (result.PageVO[mod
 	return biz.userService.PageList(param)
 }
 
+func (biz *UserQueryBiz) ListUserByIds(ids []int64) ([]model.User, error) {
+	return biz.userService.ListByIds(ids)
+}
+
 // LogIn 登录
 func (biz *UserQueryBiz) LogIn(param *param.UserLogin) (bool, error) {
 	if user, err := biz.userService.GetUserByEmail(param.Email); err != nil {
