@@ -24,6 +24,8 @@ func (u User) GetID() int {
 type Order struct {
 	ID     int
 	UserID int
+	Name   string
+	Age    int
 	Amount float64
 }
 
@@ -37,12 +39,13 @@ func main() {
 		{ID: 1, Name: "Alice", Age: 25},
 		{ID: 2, Name: "Bob", Age: 30},
 		{ID: 3, Name: "Charlie", Age: 35},
+		{ID: 4, Name: "Charlie4", Age: 3544},
 	}
 
 	orders := []Order{
 		{ID: 1, UserID: 1, Amount: 100.0},
-		{ID: 2, UserID: 2, Amount: 200.0},
-		{ID: 4, UserID: 4, Amount: 400.0},
+		{ID: 2, UserID: 3, Amount: 200.0},
+		{ID: 4, UserID: 3, Amount: 400.0},
 	}
 
 	// 使用方法一
@@ -56,6 +59,22 @@ func main() {
 	)
 	for _, r := range result2 {
 		fmt.Printf("Result: %+v\n", r)
+	}
+	result3 := data.LeftJoinData[Order, User, Order](orders, users,
+		func(l Order) int { return l.UserID },
+		func(r User) int { return r.ID },
+		func(l Order, r User) Order {
+			return Order{
+				ID:     l.ID,
+				UserID: l.UserID,
+				Name:   r.Name,
+				Age:    r.Age,
+				Amount: l.Amount,
+			}
+		},
+	)
+	for _, r := range result3 {
+		fmt.Printf("Result3: %+v\n", r)
 	}
 
 }

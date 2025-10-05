@@ -45,6 +45,22 @@ func ObjToObj[T any](s interface{}) *T {
 	return &t
 }
 
+//func ObjToObj(s interface{}, t interface{}) {
+//	mapstructure.DecodeMetadata(s, t, &mapstructure.Metadata{Keys: ``})
+//	err := copier.Copy(&t, s)
+//	if err != nil {
+//		log.Printf("ObjToObj", err)
+//	}
+//	return &t
+//}
+
+func CopyToObj(s interface{}, t interface{}) {
+	err := copier.Copy(t, s)
+	if err != nil {
+		log.Printf("CopyToObj", err)
+	}
+}
+
 //func CopierObj(s interface{}, t interface{}) interface{} {
 //	if !isPointer(t) || !isPointer(s) {
 //		panic("argument  must be pointer")

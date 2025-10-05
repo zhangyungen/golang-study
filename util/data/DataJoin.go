@@ -1,5 +1,9 @@
 package data
 
+import (
+	"zyj.com/golang-study/util/obj"
+)
+
 // MergeConfig 聚合配置
 type JoinType string
 
@@ -69,4 +73,55 @@ func MergeSlicesGeneric[T any, U any, K comparable](
 	}
 
 	return result
+}
+func LeftJoinData[L any, R any, O any, K comparable](
+	left []L,
+	right []R,
+	leftKeyFunc func(L) K,
+	rightKeyFunc func(R) K,
+	getSet func(L, R) O,
+) []O {
+	// 创建右切片的映射
+	rightMap := make(map[K]R)
+	for _, item := range right {
+		key := rightKeyFunc(item)
+		rightMap[key] = item
+	}
+
+	var outs = make([]O, 0)
+	// 处理左切片
+	for _, leftItem := range left {
+		leftKey := leftKeyFunc(leftItem)
+		if rightItem, exists := rightMap[leftKey]; exists {
+			outs = append(outs, getSet(leftItem, rightItem))
+		}
+	}
+
+	return outs
+}
+
+func JoinData[L any, R any, O any, K comparable](
+	left []L,
+	right []R,
+	leftKeyFunc func(L) K,
+	rightKeyFunc func(R) K,
+) []O {
+	// 创建右切片的映射
+	rightMap := make(map[K]R)
+	for _, item := range right {
+		key := rightKeyFunc(item)
+		rightMap[key] = item
+	}
+	var outs = make([]O, 0)
+	// 处理左切片
+	for _, leftItem := range left {
+		leftKey := leftKeyFunc(leftItem)
+		if rightItem, exists := rightMap[leftKey]; exists {
+			var out O
+			obj.CopyToObj(leftItem, &out)
+			obj.CopyToObj(rightItem, &out)
+			outs = append(outs, out)
+		}
+	}
+	return outs
 }
