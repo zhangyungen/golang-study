@@ -38,16 +38,12 @@ func main() {
 	// The 2nd parameter is the default value to be used in case the given parameter name does not exist on
 	// the Dynamic Config object. This can happen when there is a typo, or when the user is offline and the
 	// value has not been cached on the client.
-	itemName := config.GetString("product_name", "Awesome Product v1")
-	price := config.GetNumber("price", 10.0)
-	shouldDiscount := config.GetBool("discount", false)
-
-	// Or just get the whole json object backing this config if you prefer
-	json := config.Value
-
-	// Values via getLayer
+	var itemName = config.GetString("product_name", "Awesome Product v1")
+	var price = config.GetNumber("price", 10.0)
+	var shouldDiscount = config.GetBool("discount", false) // Or just get the whole json object backing this config if you prefer
+	var json = config.Value                                // Values via getLayer
 	layer := statsig.GetLayer(user, "user_promo_experiments")
-	promoTitle := layer.GetString("title", "Welcome to Statsig!")
+	var promoTitle = layer.GetString("title", "Welcome to Statsig!")
 	discount := layer.GetNumber("discount", 0.1)
 
 	// or, via getExperiment
@@ -55,16 +51,11 @@ func main() {
 	titleExperiment := statsig.GetExperiment(user, "new_user_promo_title")
 	priceExperiment := statsig.GetExperiment(user, "new_user_promo_price")
 
-	promoTitle := titleExperiment.GetString("title", "Welcome to Statsig!")
-	discount := priceExperiment.GetNumber("discount", 0.1)
+	var promoTitle = titleExperiment.GetString("title", "Welcome to Statsig!")
+	var discount = priceExperiment.GetNumber("discount", 0.1)
+	var price = 1 * (1 - discount) // getting the layer name that an experiment belongs to
 
-	price := 1 * (1 - discount)
-
-	// getting the layer name that an experiment belongs to
-
-	userPromoLayer := statsig.GetExperimentLayer("new_user_promo_title")
-
-	//Logging an Event
+	var userPromoLayer = statsig.GetExperimentLayer("new_user_promo_title") //Logging an Event
 	statsig.LogEvent(statsig.Event{
 		User:      user,
 		EventName: "add_to_cart",
