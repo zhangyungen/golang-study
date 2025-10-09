@@ -1,11 +1,11 @@
-package main
+package goroutine
 
 type Worker struct {
 	stop chan struct{}
 	done chan struct{}
 }
 
-func NewWorker(args ...interface{}) *Worker {
+func NewWorker(args ...func()) *Worker {
 	w := &Worker{
 		stop: make(chan struct{}),
 		done: make(chan struct{}),

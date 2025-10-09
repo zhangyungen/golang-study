@@ -12,7 +12,9 @@ require (
 	github.com/lib/pq v1.10.7
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/petermattis/goid v0.0.0-20250904145737-900bdf8bb490
+	github.com/sasha-s/go-deadlock v0.3.6
 	github.com/spf13/viper v1.3.2
 	github.com/statsig-io/go-sdk v1.40.0
 	go.uber.org/zap v1.27.0
@@ -46,12 +48,10 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
 	github.com/pelletier/go-toml v1.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/quic-go/quic-go v0.54.0 // indirect
-	github.com/sasha-s/go-deadlock v0.3.6 // indirect
 	github.com/spf13/afero v1.1.2 // indirect
 	github.com/spf13/cast v1.3.0 // indirect
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
