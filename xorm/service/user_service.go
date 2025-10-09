@@ -32,8 +32,6 @@ func (us *UserService) CreateUser(user *model.User) error {
 	if user.Email == "" {
 		return errors.New("email is required")
 	}
-	//session := us.getDBSession()
-	//defer us.closeDBSession(session)
 	return us.Create(user)
 }
 
@@ -53,8 +51,8 @@ func (us *UserService) GetUserByEmail(email string) (*model.User, error) {
 	if email == "" {
 		return nil, errors.New("email is required")
 	}
-	session := us.GetDBSession()
-	defer us.ReturnDBSession(session)
+	session := us.getDBSession()
+	defer us.returnDBSession(session)
 	return us.userDAO.GetByEmail(session, email)
 }
 
