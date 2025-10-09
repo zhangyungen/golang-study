@@ -51,8 +51,8 @@ func (us *UserService) GetUserByEmail(email string) (*model.User, error) {
 	if email == "" {
 		return nil, errors.New("email is required")
 	}
-	session := us.getDBSession()
-	defer us.returnDBSession(session)
+	session := us.GetDBSession()
+	defer us.ReturnDBSession(session)
 	return us.userDAO.GetByEmail(session, email)
 }
 

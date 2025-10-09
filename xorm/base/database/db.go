@@ -3,19 +3,25 @@ package database
 import (
 	"errors"
 	_ "github.com/go-sql-driver/mysql"
+	cmap "github.com/orcaman/concurrent-map/v2"
 	"github.com/petermattis/goid"
 	"log"
 	"reflect"
+	"strconv"
 	"sync"
 	"time"
 	"xorm.io/xorm"
 )
 
 var (
-	engine        *xorm.Engine
-	once          sync.Once
-	sessionMap    = make(map[int64]*xorm.Session, 1)
-	idKeyTableMap = make(map[string]string, 1)
+	engine *xorm.Engine
+	once   sync.Once
+	//sessionMap    = make(map[int64]*xorm.Session, 1)
+	//idKeyTableMap = make(map[string]string, 1)
+	//sessionMap    sync.Map
+	//idKeyTableMap sync.Map
+	idKeyTableMap = cmap.New[string]()
+	sessionMap    = cmap.New[*xorm.Session]()
 )
 
 // Init 初始化数据库连接
@@ -69,25 +75,33 @@ func CloseEngine() error {
 // getDBSession 创建新的数据库会话
 func GetDBSession() *xorm.Session {
 	id := goid.Get() // 直接获取当前 goroutine 的 Id
-	if sessionMap[id] != nil {
-		return sessionMap[id]
+	idStr := strconv.FormatInt(id, 10)
+	value, ok := sessionMap.Get(idStr)
+	if ok {
+		return value
 	}
-	sessionMap[id] = getEngine().NewSession()
-	return sessionMap[id]
+	session := getEngine().NewSession()
+	sessionMap.Set(idStr, session)
+	return session
 }
 
 // ReturnSession 关闭数据库回话
 func ReturnSession(session *xorm.Session) error {
 	id := goid.Get() // 直接获取当前 goroutine 的 Id
-	if session == nil {
+	idStr := strconv.FormatInt(id, 10)
+	holdSession, ok := sessionMap.Get(idStr)
+	if !ok {
+		return errors.New("argument session is not ok ,don't close ")
+	}
+	if holdSession == nil {
 		return errors.New("argument session is nil ,don't close ")
 	}
-	if sessionMap[id] != session {
+	if holdSession != session {
 		return errors.New("close session failed，close session and goroutine session is not same，don use goroutine for you session code ")
 	}
 	if !session.IsInTx() {
 		err := session.Close()
-		delete(sessionMap, id)
+		sessionMap.Remove(idStr)
 		return err
 	} else {
 		log.Println("session is in transaction,don't close")
@@ -119,8 +133,9 @@ func GetPrimaryKey[T any]() (string, error) {
 	var t T
 	r := reflect.TypeOf(t)
 	typeString := r.PkgPath() + "." + r.Name()
-	if idKeyTableMap[typeString] != "" {
-		return idKeyTableMap[typeString], nil
+	value, b := idKeyTableMap.Get(typeString)
+	if b {
+		return value, nil
 	}
 	engine := getEngine()
 	//tableName := engine.TableName(model, true)
@@ -131,7 +146,7 @@ func GetPrimaryKey[T any]() (string, error) {
 
 	for _, col := range table.Columns() {
 		if col.IsPrimaryKey {
-			idKeyTableMap[typeString] = col.Name
+			idKeyTableMap.Set(typeString, col.Name)
 			return col.Name, nil
 		}
 	}
