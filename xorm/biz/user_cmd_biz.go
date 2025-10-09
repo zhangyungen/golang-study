@@ -11,6 +11,7 @@ import (
 // UserCmdBiz 用户CMDService
 type UserCmdBiz struct {
 	*base.BaseCmdBiz
+
 	userService *service.UserService
 }
 

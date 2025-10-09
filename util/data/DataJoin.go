@@ -88,7 +88,7 @@ func LeftJoinData[L any, R any, O any, K comparable](
 		rightMap[key] = item
 	}
 
-	var outs = make([]O, 0)
+	var outs = make([]O, 0, len(left))
 	// 处理左切片
 	for _, leftItem := range left {
 		leftKey := leftKeyFunc(leftItem)
@@ -112,7 +112,7 @@ func JoinData[L any, R any, O any, K comparable](
 		key := rightKeyFunc(item)
 		rightMap[key] = item
 	}
-	var outs = make([]O, 0)
+	var outs = make([]O, 0, len(left))
 	// 处理左切片
 	for _, leftItem := range left {
 		leftKey := leftKeyFunc(leftItem)
