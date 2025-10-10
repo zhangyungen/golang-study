@@ -76,3 +76,7 @@ func (bs *BaseService[T, K]) Count(entity *T) (int64, error) {
 func (bs *BaseService[T, K]) ExecuteTx(fn func() error) error {
 	return database.WithTransaction(fn)
 }
+
+func (bs *BaseService[T, K]) ExecuteTxSession(fn func(session *xorm.Session) error) error {
+	return database.ExecuteTxSession(fn)
+}

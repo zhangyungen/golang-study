@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 	"xorm.io/xorm"
+	"zyj.com/golang-study/util/obj"
 )
 
 var (
@@ -85,45 +86,56 @@ func GetDBSession() *xorm.Session {
 }
 
 // ReturnSession 关闭数据库回话
-func ReturnSession(session *xorm.Session) error {
+func ReturnSession(session *xorm.Session) {
 	id := goid.Get() // 直接获取当前 goroutine 的 Id
 	idStr := strconv.FormatInt(id, 10)
 	holdSession, ok := sessionMap.Get(idStr)
 	if !ok {
-		return errors.New("argument session is not ok ,don't close ")
+		log.Println("argument session is not ok ,don't close ")
 	}
 	if holdSession == nil {
-		return errors.New("argument session is nil ,don't close ")
+		log.Println("argument session is nil ,don't close ")
 	}
 	if holdSession != session {
-		return errors.New("close session failed，close session and goroutine session is not same，don use goroutine for you session code ")
+		log.Println("close session failed，close session and goroutine session is not same，don use goroutine for you session code ")
 	}
 	if !session.IsInTx() {
 		err := session.Close()
 		sessionMap.Remove(idStr)
-		return err
+		if err != nil {
+			log.Println("close session failed:", err)
+		}
 	} else {
 		log.Println("session is in transaction,don't close")
 	}
-	return nil
 }
 
 func WithTransaction(fn func() (err error)) (err error) {
 	session := GetDBSession()
-	defer func(session *xorm.Session) {
-		err := ReturnSession(session)
-		if err != nil {
-			log.Println("close session failed:", err)
-		}
-	}(session)
+	defer ReturnSession(session)
 	if !session.IsInTx() {
 		if err := session.Begin(); err != nil {
 			return err
 		}
 	}
 	if err := fn(); err != nil {
-		_ = session.Rollback()
-		return err
+		err2 := session.Rollback()
+		return errors.Join(err, err2)
+	}
+	return session.Commit()
+}
+
+func WithTransactionSession(fn func(session *xorm.Session) (err error)) (err error) {
+	session := GetDBSession()
+	defer ReturnSession(session)
+	if !session.IsInTx() {
+		if err := session.Begin(); err != nil {
+			return err
+		}
+	}
+	if err := fn(session); err != nil {
+		err2 := session.Rollback()
+		return errors.Join(err, err2)
 	}
 	return session.Commit()
 }
@@ -150,4 +162,42 @@ func GetPrimaryKey[T any]() (string, error) {
 		}
 	}
 	return "", errors.New("no primary key found")
+}
+
+func QueryRowsBySql[T any](session *xorm.Session, sql string) ([]T, error) {
+	exec, err := session.QueryInterface(sql)
+	if err != nil {
+		return nil, err
+	}
+	count := len(exec)
+	var rows = make([]T, 0, count)
+	for _, v := range exec {
+		t := obj.MapToObjByStr[T](v)
+		rows = append(rows, *t)
+	}
+	return rows, nil
+}
+
+func QueryRowBySql[T any](session *xorm.Session, sql string) (*T, error) {
+	exec, err := session.QueryInterface(sql)
+	var t T
+	if err != nil {
+		return &t, err
+	}
+	if len(exec) > 1 {
+		return &t, errors.New("multi rows found")
+	}
+	if len(exec) == 0 {
+		return &t, errors.New("not rows found")
+	}
+	for _, v := range exec {
+		t = *obj.MapToObjByStr[T](v)
+	}
+	return &t, nil
+}
+
+func ExecuteTxSession(fn func(session *xorm.Session) error) error {
+	session := GetDBSession()
+	defer ReturnSession(session)
+	return fn(session)
 }

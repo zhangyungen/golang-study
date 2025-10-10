@@ -1,6 +1,8 @@
 package base
 
-import "zyj.com/golang-study/xorm/base/database"
+import (
+	"zyj.com/golang-study/xorm/base/database"
+)
 
 // UserService 用户Service
 type BaseCmdBiz struct {

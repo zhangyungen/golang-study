@@ -89,6 +89,14 @@ func MapToObj[T any](param map[interface{}]interface{}) *T {
 	}
 	return &obj
 }
+func MapToObjByStr[T any](param map[string]interface{}) *T {
+	var obj T
+	err := mapstructure.Decode(param, &obj)
+	if err != nil {
+		log.Println("MapObject error ", err)
+	}
+	return &obj
+}
 
 func isPointer(v interface{}) bool {
 	return reflect.TypeOf(v).Kind() == reflect.Ptr

@@ -23,11 +23,12 @@ var UserCmdBizIns = &UserCmdBiz{base.BaseCmdBizIns,
 	service.UserServiceIns, service.UserLoginLogServiceIns}
 
 // CreateUser 创建用户
-func (biz *UserCmdBiz) CreateUser(user *param.UserCreate) error {
-	return biz.ExecuteTx(func() error {
-		toObj := obj.ObjToObj[model.User](user)
+func (biz *UserCmdBiz) CreateUser(user *param.UserCreate) (*model.User, error) {
+	toObj := obj.ObjToObj[model.User](user)
+	err := biz.ExecuteTx(func() error {
 		return service.UserServiceIns.CreateUser(toObj)
 	})
+	return toObj, err
 }
 
 func (biz *UserCmdBiz) UpdateUser(user *param.UserUpdate) error {
