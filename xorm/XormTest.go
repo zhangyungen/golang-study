@@ -30,12 +30,12 @@ func main() {
 		log.Println(err)
 	}
 
-	in, err := biz.UserQueryBizIns.LogIn(&param.UserLogin{Email: "zyj@163fff.com", Pwd: "123456"})
+	in, err := biz.UserCmdBizIns.LogIn(&param.UserLogin{Email: "zyj@163fff.com", Pwd: "123456"})
 
 	if err != nil {
 		log.Println(err)
 	} else {
-		log.Println("登录状态 %v", in)
+		log.Println("登录状态", in)
 	}
 
 	pages, err := biz.UserQueryBizIns.PageUser(&param.PageParam{Page: 1, PageSize: 10})
@@ -53,9 +53,7 @@ func main() {
 	}
 
 	//业务代码结束
-
-	log.Printf("after biz")
-
+	log.Println("after biz")
 	err = database.CloseEngine()
 	if err != nil {
 		log.Println(err)

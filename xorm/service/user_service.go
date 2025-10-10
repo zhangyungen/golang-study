@@ -22,9 +22,6 @@ var UserServiceIns = &UserService{&base.BaseService[model.User, int64]{},
 
 // CreateUser 创建用户
 func (us *UserService) CreateUser(user *model.User) error {
-
-	//todo check and model biz
-
 	// 数据验证
 	if user.Name == "" {
 		return errors.New("name is required")
@@ -32,17 +29,18 @@ func (us *UserService) CreateUser(user *model.User) error {
 	if user.Email == "" {
 		return errors.New("email is required")
 	}
-	return us.Create(user)
+	session := us.GetDBSession()
+	defer us.ReturnDBSession(session)
+	//todo check and model biz
+	return us.userDAO.CreateUser(session, user)
 }
 
-// GetUser 获取用户
-func (us *UserService) GetUser(id int64) (*model.User, error) {
+// GetUserById 获取用户
+func (us *UserService) GetUserById(id int64) (*model.User, error) {
+	//todo check and model biz
 	if id <= 0 {
 		return nil, errors.New("invalid user id")
 	}
-	//session := us.getDBSession()
-	//defer us.closeDBSession(session)
-	//todo check and model biz
 	return us.GetByID(id)
 }
 
@@ -58,14 +56,13 @@ func (us *UserService) GetUserByEmail(email string) (*model.User, error) {
 
 // UpdateUser 更新用户
 func (us *UserService) UpdateUser(user *model.User) error {
+	//todo check and model biz
 	if user.Id <= 0 {
 		return errors.New("invalid user id")
 	}
-	//session := us.getDBSession()
-	//defer us.closeDBSession(session)
-	//todo check and model biz
-
-	return us.UpdateById(user.Id, user)
+	session := us.GetDBSession()
+	defer us.ReturnDBSession(session)
+	return us.userDAO.UpdateUser(session, user)
 }
 
 // DeleteUser 删除用户
@@ -73,9 +70,6 @@ func (us *UserService) DeleteUserById(id int64) error {
 	if id <= 0 {
 		return errors.New("invalid user id")
 	}
-	//session := us.getDBSession()
-	//defer us.closeDBSession(session)
-	//todo check and model biz
 	return us.DeleteById(id, &model.User{})
 }
 

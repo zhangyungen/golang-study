@@ -30,7 +30,7 @@ func ConvertToModel(user *UserCreate) *model.User {
 	userReturn := &model.User{}
 	err := copier.Copy(userReturn, &user) // 核心拷贝操作
 	if err != nil {
-		log.Println("copier error: %v", err)
+		log.Println("copier error ", err)
 		return userReturn
 	}
 	return userReturn

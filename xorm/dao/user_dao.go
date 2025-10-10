@@ -42,8 +42,8 @@ func (ud *UserDAO) GetByEmail(session *xorm.Session, email string) (*model.User,
 	return &user, nil
 }
 
-// Update 更新用户
-func (ud *UserDAO) Update(session *xorm.Session, user *model.User) error {
+// UpdateUser 更新用户
+func (ud *UserDAO) UpdateUser(session *xorm.Session, user *model.User) error {
 	//检查用户是否存在
 	existing, err := ud.GetByID(session, user.Id)
 	if err != nil {

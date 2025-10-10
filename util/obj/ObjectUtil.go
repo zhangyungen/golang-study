@@ -12,7 +12,7 @@ import (
 func ObjToJsonStr(obj interface{}) string {
 	meta, err := json.Marshal(obj)
 	if err != nil {
-		log.Printf("ObjToJsonStr", err)
+		log.Println("ObjToJsonStr error ", err)
 		return ""
 	}
 	return string(meta)
@@ -23,7 +23,7 @@ func JsonStrToObj[T any](str string) *T {
 	obj := new(T)
 	err := json.Unmarshal([]byte(str), obj)
 	if err != nil {
-		log.Printf("JsonStrToObj", err)
+		log.Println("JsonStrToObj error ", err)
 		return obj
 	}
 	return obj
@@ -40,7 +40,7 @@ func ObjToObj[T any](s interface{}) *T {
 	var t T
 	err := copier.Copy(&t, s)
 	if err != nil {
-		log.Printf("ObjToObj", err)
+		log.Println("ObjToObj error ", err)
 	}
 	return &t
 }
@@ -49,7 +49,7 @@ func ObjToObj[T any](s interface{}) *T {
 //	mapstructure.DecodeMetadata(s, t, &mapstructure.Metadata{Keys: ``})
 //	err := copier.Copy(&t, s)
 //	if err != nil {
-//		log.Printf("ObjToObj", err)
+//		log.Println("ObjToObj", err)
 //	}
 //	return &t
 //}
@@ -57,7 +57,7 @@ func ObjToObj[T any](s interface{}) *T {
 func CopyToObj(s interface{}, t interface{}) {
 	err := copier.Copy(t, s)
 	if err != nil {
-		log.Printf("CopyToObj", err)
+		log.Println("CopyToObj error ", err)
 	}
 }
 
@@ -67,7 +67,7 @@ func CopyToObj(s interface{}, t interface{}) {
 //	}
 //	err := copier.Copy(t, s)
 //	if err != nil {
-//		log.Printf("CopierObj", err)
+//		log.Println("CopierObj", err)
 //	}
 //	return t
 //}
@@ -76,7 +76,7 @@ func ObjToMap(s interface{}) map[interface{}]interface{} {
 	var myMap map[interface{}]interface{}
 	err := mapstructure.Decode(s, &myMap)
 	if err != nil {
-		log.Printf("ObjToMap", err)
+		log.Println("ObjToMap error ", err)
 	}
 	return myMap
 }
@@ -85,7 +85,7 @@ func MapToObj[T any](param map[interface{}]interface{}) *T {
 	var obj T
 	err := mapstructure.Decode(param, &obj)
 	if err != nil {
-		log.Printf("MapObject", err)
+		log.Println("MapObject error ", err)
 	}
 	return &obj
 }

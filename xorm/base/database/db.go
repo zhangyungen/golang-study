@@ -33,7 +33,6 @@ func Init(driver, dsn string) error {
 		if err != nil {
 			log.Println("Failed to connect to database:", err)
 			panic(err)
-			return
 		}
 
 		// 配置连接池

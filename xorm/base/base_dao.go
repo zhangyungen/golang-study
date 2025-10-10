@@ -29,7 +29,7 @@ func (bd *BaseDAO[T, K]) GetByID(session *xorm.Session, id K) (*T, error) {
 	return &entity, nil
 }
 
-// Update 更新用户
+// UpdateUser 更新用户
 func (bd *BaseDAO[T, K]) UpdateById(session *xorm.Session, id K, entity *T) error {
 	_, err := session.ID(id).Update(entity)
 	return err
@@ -55,6 +55,9 @@ func (bd *BaseDAO[T, K]) Page(session *xorm.Session, param *param.PageParam) (re
 	}
 	var entities []T
 	err := session.Limit(param.PageSize, param.PageSize*(param.Page-1)).Find(&entities)
+	if err != nil {
+		return result.PageVO[T]{}, err
+	}
 	var t T
 	count, err := session.Count(t)
 	if err != nil {
