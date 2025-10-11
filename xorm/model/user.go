@@ -12,8 +12,10 @@ type User struct {
 	Status    int       `xorm:"'status' int default 1" json:"status"`
 	CreatedAt time.Time `xorm:"'created_at' created" json:"createdAt"`
 	UpdatedAt time.Time `xorm:"'updated_at' updated" json:"updatedAt"`
-	Version   int       `xorm:"version"`
-	Deleted   int8      `xorm:"deleted int  default 0"`
+	Version   int       `xorm:"'version' version" json:"version"`
+	//注意标记数据库字段必须用单引号包起来
+	//notnull 也要标记，否者会出现插入nil情况，
+	Deleted int8 `xorm:"'deleted' tinyint notnull default 0" json:"deleted"`
 }
 
 func (User) TableName() string {

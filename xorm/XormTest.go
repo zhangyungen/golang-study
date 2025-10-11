@@ -23,7 +23,6 @@ func main() {
 	}
 
 	sqlStr := sql.GetUserLoginSql(param.UserCreate{Name: "192.168.1.3"})
-	log.Println(sqlStr)
 	var userLoginLogs []model.UserLoginLog
 	err = service.UserServiceIns.ExecuteTxSession(func(session *xorm.Session) error {
 		userLoginLogs, err = database.QueryRowsBySql[model.UserLoginLog](session, sqlStr)
@@ -36,7 +35,7 @@ func main() {
 
 	//database.GetEngine().Sync2(new(model.User))
 	//业务代码开始
-	user, err := biz.UserCmdBizIns.CreateUser(&param.UserCreate{Name: "zyj2fffdsa", Email: "zyjff0@fffvvffffkkkk.com"})
+	user, err := biz.UserCmdBizIns.CreateUser(&param.UserCreate{Name: "zyj2fffdsa", Email: "zyjff0@ff99fpaffkookkk.com"})
 
 	if err != nil {
 		logger.GetSimplifiedStack(err)
@@ -45,7 +44,7 @@ func main() {
 		log.Println("create user", obj.ObjToJsonStr(user))
 	}
 
-	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 1, Name: "zyj2fdsaff", Email: "zyj999000@163kkkk.com"})
+	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 1, Name: "zyj2fdsaff", Email: "zyj9899900d0@163kkkk.com"})
 
 	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 100, Name: "updatetest"})
 
