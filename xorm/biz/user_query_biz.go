@@ -15,10 +15,14 @@ type UserQueryBiz struct {
 // 全局UserQueryBizIns实例
 var UserQueryBizIns = &UserQueryBiz{userService: service.UserServiceIns}
 
-func (biz *UserQueryBiz) PageUser(param *param.PageParam) (result.PageVO[model.User], error) {
+func (biz *UserQueryBiz) PageUser(param *param.PageParam) (*result.PageVO[model.User], error) {
 	return biz.userService.Page(param)
 }
 
 func (biz *UserQueryBiz) ListUserByIds(ids []int64) ([]model.User, error) {
 	return biz.userService.ListByIds(ids)
+}
+
+func (biz *UserQueryBiz) GetUserById(id int64) (*model.User, error) {
+	return biz.userService.GetUserById(id)
 }

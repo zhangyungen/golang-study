@@ -46,7 +46,7 @@ func (bd *BaseDAO[T, K]) Insert(session *xorm.Session, entity *T) error {
 	return err
 }
 
-func (bd *BaseDAO[T, K]) Page(session *xorm.Session, param *param.PageParam) (result.PageVO[T], error) {
+func (bd *BaseDAO[T, K]) Page(session *xorm.Session, param *param.PageParam) (*result.PageVO[T], error) {
 	if param.Page <= 0 {
 		param.Page = 1
 	}
@@ -56,12 +56,12 @@ func (bd *BaseDAO[T, K]) Page(session *xorm.Session, param *param.PageParam) (re
 	var entities []T
 	err := session.Limit(param.PageSize, param.PageSize*(param.Page-1)).Find(&entities)
 	if err != nil {
-		return result.PageVO[T]{}, err
+		return &result.PageVO[T]{}, err
 	}
 	var t T
 	count, err := session.Count(t)
 	if err != nil {
-		return result.PageVO[T]{}, err
+		return &result.PageVO[T]{}, err
 	}
 	return result.Convert2PageVO[T](param, count, entities), nil
 }

@@ -125,3 +125,27 @@ func JoinData[L any, R any, O any, K comparable](
 	}
 	return outs
 }
+
+func MapKeyObject[T any, K comparable](
+	Objs []T,
+	leftKeyFunc func(T) K,
+) map[K]T {
+	rightMap := make(map[K]T, len(Objs))
+	for _, item := range Objs {
+		key := leftKeyFunc(item)
+		rightMap[key] = item
+	}
+	return rightMap
+}
+
+func MapKeyObjectPtr[T any, K comparable](
+	Objs []T,
+	leftKeyFunc func(T) K,
+) map[K]*T {
+	rightMap := make(map[K]*T, len(Objs))
+	for _, item := range Objs {
+		key := leftKeyFunc(item)
+		rightMap[key] = &item
+	}
+	return rightMap
+}

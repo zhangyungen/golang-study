@@ -52,7 +52,7 @@ func (bs *BaseService[T, K]) Create(entity *T) error {
 	return bs.baseDAO.Insert(bs.GetDBSession(), entity)
 }
 
-func (bs *BaseService[T, K]) Page(param *param.PageParam) (result.PageVO[T], error) {
+func (bs *BaseService[T, K]) Page(param *param.PageParam) (*result.PageVO[T], error) {
 	session := bs.GetDBSession()
 	defer bs.ReturnDBSession(session)
 	return bs.baseDAO.Page(session, param)
