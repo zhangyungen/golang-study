@@ -43,7 +43,9 @@ func main() {
 		log.Println("create user", obj.ObjToJsonStr(user))
 	}
 
-	err = biz.UserCmdBizIns.UpdateUser(&param.UserUpdate{Id: 1, Name: "zyj2fdsa", Email: "zyj000@163kkkk.com"})
+	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 1, Name: "zyj2fdsa", Email: "zyj000@163kkkk.com"})
+
+	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Name: "updatetest"})
 
 	if err != nil {
 		log.Println(err)

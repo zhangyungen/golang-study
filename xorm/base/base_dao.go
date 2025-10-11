@@ -29,9 +29,16 @@ func (bd *BaseDAO[T, K]) GetByID(session *xorm.Session, id K) (*T, error) {
 	return &entity, nil
 }
 
-// UpdateUser 更新用户
+// UpdateUserById 更新用户
 func (bd *BaseDAO[T, K]) UpdateById(session *xorm.Session, id K, entity *T) error {
 	_, err := session.ID(id).Update(entity)
+	return err
+}
+
+// UpdateUserById 更新用户
+func (bd *BaseDAO[T, K]) BatchUpdateByIds(session *xorm.Session, ids []K, entity *T) error {
+	key, err := database.GetPrimaryKey[T]()
+	_, err = session.In(key, ids).Update(entity)
 	return err
 }
 

@@ -54,15 +54,15 @@ func (us *UserService) GetUserByEmail(email string) (*model.User, error) {
 	return us.userDAO.GetByEmail(session, email)
 }
 
-// UpdateUser 更新用户
-func (us *UserService) UpdateUser(user *model.User) error {
+// UpdateUserById 更新用户
+func (us *UserService) UpdateUserById(user *model.User) error {
 	//todo check and model biz
 	if user.Id <= 0 {
 		return errors.New("invalid user id")
 	}
 	session := us.GetDBSession()
 	defer us.ReturnDBSession(session)
-	return us.userDAO.UpdateUser(session, user)
+	return us.userDAO.UpdateUserById(session, user)
 }
 
 // DeleteUser 删除用户

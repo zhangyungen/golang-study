@@ -31,9 +31,9 @@ func (biz *UserCmdBiz) CreateUser(user *param.UserCreate) (*model.User, error) {
 	return toObj, err
 }
 
-func (biz *UserCmdBiz) UpdateUser(user *param.UserUpdate) error {
+func (biz *UserCmdBiz) UpdateUserById(user *param.UserUpdate) error {
 	userModel := obj.ObjToObj[model.User](user)
-	return service.UserServiceIns.UpdateUser(userModel)
+	return service.UserServiceIns.UpdateUserById(userModel)
 }
 
 // LogIn 登录
