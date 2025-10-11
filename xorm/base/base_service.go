@@ -33,11 +33,11 @@ func (bs *BaseService[T, K]) GetByID(id K) (*T, error) {
 }
 
 // Update 实体
-func (bs *BaseService[T, K]) UpdateById(id K, entity *T) error {
+func (bs *BaseService[T, K]) UpdateById(id K, entity *T) (int64, error) {
 	session := bs.GetDBSession()
 	defer bs.ReturnDBSession(session)
-	_, err := bs.baseDAO.UpdateById(session, id, entity)
-	return err
+	c, err := bs.baseDAO.UpdateById(session, id, entity)
+	return c, err
 }
 
 // DeleteById 删除用户
@@ -53,6 +53,12 @@ func (bs *BaseService[T, K]) Create(entity *T) error {
 	return bs.baseDAO.Insert(bs.GetDBSession(), entity)
 }
 
+func (bs *BaseService[T, K]) BatchCreate(entity *[]T) error {
+	session := bs.GetDBSession()
+	defer bs.ReturnDBSession(session)
+	return bs.baseDAO.BatchInsert(bs.GetDBSession(), entity)
+}
+
 func (bs *BaseService[T, K]) Page(param *param.PageParam) (*result.PageVO[T], error) {
 	session := bs.GetDBSession()
 	defer bs.ReturnDBSession(session)
@@ -65,11 +71,11 @@ func (bs *BaseService[T, K]) ListByIds(ids []K) ([]T, error) {
 	return bs.baseDAO.ListByIds(session, ids)
 }
 
-func (bs *BaseService[T, K]) BatchUpdateByIds(ids []K, entity *T) error {
+func (bs *BaseService[T, K]) BatchUpdateByIds(ids []K, entity *T) (int64, error) {
 	session := bs.GetDBSession()
 	defer bs.ReturnDBSession(session)
-	_, err := bs.baseDAO.BatchUpdateByIds(session, ids, entity)
-	return err
+	c, err := bs.baseDAO.BatchUpdateByIds(session, ids, entity)
+	return c, err
 }
 
 // Count 统计数量

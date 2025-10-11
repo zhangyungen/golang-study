@@ -72,6 +72,11 @@ func main() {
 	var param3 = obj.JsonStrToObj[result.PageVO[model.User]](json)
 	log.Println("ObjToJsonStr param3", obj.ObjToJsonStr(&param3))
 
+	strs := make([]string, 0)
+	strs = add(strs)
+	strs = add(strs)
+	strs = add(strs)
+	log.Println("add strs", strs)
 	//
 	//fmt.Println("=== Go 语言位运算 ===\n")
 	//fmt.Println("TokenTypeBitRefresh:", TokenTypeBitRefresh)
@@ -96,4 +101,9 @@ func main() {
 	//log := logger.NewProduction()
 	//log.Infof("hello %s", "world")
 
+}
+
+func add(strs []string) []string {
+	strs = append(strs, "hello")
+	return strs
 }

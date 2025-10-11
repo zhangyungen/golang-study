@@ -64,6 +64,11 @@ func (bd *BaseDAO[T, K]) Insert(session *xorm.Session, entity *T) error {
 	return err
 }
 
+func (bd *BaseDAO[T, K]) BatchInsert(session *xorm.Session, entitys *[]T) error {
+	_, err := session.InsertMulti(entitys)
+	return err
+}
+
 func (bd *BaseDAO[T, K]) Page(session *xorm.Session, param *param.PageParam) (*result.PageVO[T], error) {
 	if param.Page <= 0 {
 		param.Page = 1
