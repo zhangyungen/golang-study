@@ -142,12 +142,12 @@ func PreloadHotData(ctx context.Context, cache *otter.Cache[int, model.User]) er
 
 	//hotKeys:= []int64{1,2,3,4,5,6,7,8,9,10}
 	//// 批量加载器
-	//bulkLoader := otter.BulkLoaderFunc[int, model.User](func(ctx context.Context, keys []int64) (map[int]model.User, error) {
+	//bulkLoader := otter.BulkLoaderFunc[int, model.User](func(cacheCtx context.Context, keys []int64) (map[int]model.User, error) {
 	//	return biz.UserQueryBizIns.ListUserByIds(keys)
 	//})
 	//
 	//// 批量预热
-	//_, err = cache.BulkGet(ctx, hotKeys, bulkLoader)
+	//_, err = cache.BulkGet(cacheCtx, hotKeys, bulkLoader)
 	//return err
 	return nil
 }
@@ -159,7 +159,7 @@ func GetProduct(ctx context.Context, cache *otter.Cache[int, model.User], id int
 	//}
 	//
 	//// 2. 从缓存获取
-	//product, err := cache.Get(ctx, id, func(ctx context.Context, id int) (model.User, error) {
+	//product, err := cache.get(cacheCtx, id, func(cacheCtx context.Context, id int) (model.User, error) {
 	//	// 3. 数据库查询
 	//	p, err := db.GetProduct(id)
 	//	if err == sql.ErrNoRows {

@@ -74,7 +74,7 @@ func (us *UserService) DeleteUserById(id int64) error {
 }
 
 // ListUsers 用户列表
-func (us *UserService) PageListUser(param *param.PageParam) (result.PageVO[model.User], error) {
+func (us *UserService) PageListUser(param *param.PageParam) (*result.PageVO[model.User], error) {
 	//session := us.getDBSession()
 	//defer us.closeDBSession(session)
 	//todo check and model biz
