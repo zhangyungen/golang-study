@@ -36,7 +36,8 @@ func (bs *BaseService[T, K]) GetByID(id K) (*T, error) {
 func (bs *BaseService[T, K]) UpdateById(id K, entity *T) error {
 	session := bs.GetDBSession()
 	defer bs.ReturnDBSession(session)
-	return bs.baseDAO.UpdateById(session, id, entity)
+	_, err := bs.baseDAO.UpdateById(session, id, entity)
+	return err
 }
 
 // DeleteById 删除用户
@@ -62,6 +63,13 @@ func (bs *BaseService[T, K]) ListByIds(ids []K) ([]T, error) {
 	session := bs.GetDBSession()
 	defer bs.ReturnDBSession(session)
 	return bs.baseDAO.ListByIds(session, ids)
+}
+
+func (bs *BaseService[T, K]) BatchUpdateByIds(ids []K, entity *T) error {
+	session := bs.GetDBSession()
+	defer bs.ReturnDBSession(session)
+	_, err := bs.baseDAO.BatchUpdateByIds(session, ids, entity)
+	return err
 }
 
 // Count 统计数量

@@ -176,7 +176,6 @@ func (dc *DistributedCache) silentDelete(key string) {
 func (dc *DistributedCache) silentSet(key, value string) {
 	dc.syncMutex.Lock()
 	defer dc.syncMutex.Unlock()
-
 	// 标记为本地操作，避免循环广播
 	dc.localOnlyKeys[key] = true
 	dc.primaryCache.Set(key, value)
@@ -202,7 +201,7 @@ func (dc *DistributedCache) sendSyncMessage(operation OperationType, key, value 
 	return dc.secondaryCache.Publish(dc.cacheCtx, dc.config.PubSubChannel, message).Err()
 }
 
-// get 方法：二级缓存读取
+// get 方法：一二级缓存读取
 func (dc *DistributedCache) get(key string) (string, error) {
 	// 1. 尝试从一级缓存获取
 	if value, err := dc.primaryCache.Get(dc.cacheCtx, key, nil); err != nil {
@@ -224,7 +223,7 @@ func (dc *DistributedCache) get(key string) (string, error) {
 	return value, nil
 }
 
-// Set 方法：二级缓存写入
+// Set 方法：一二级缓存写入
 func (dc *DistributedCache) set(key, value string) error {
 	// 1. 先写入二级缓存（确保数据持久化）
 	if err := dc.secondaryCache.Set(dc.cacheCtx, key, value, dc.config.RedisTTL).Err(); err != nil {
@@ -286,7 +285,8 @@ func (dc *DistributedCache) GetWithLoader(
 	// 2. 从数据源加载
 	value, err := loader(dc.cacheCtx, key)
 	if err != nil {
-		return "", err
+		log.Println("Failed to load data:", err)
+		value = ""
 	}
 
 	// 3. 设置缓存
@@ -344,20 +344,19 @@ func (dc *DistributedCache) MGetWithLoader(keys []string, loader func(context co
 
 	// 2. 检查未命中的键
 	var missingKeysPrimary []string
-	var missingKeysSecond []string
 	for _, key := range keys {
 		if _, found := result[key]; !found {
 			missingKeysPrimary = append(missingKeysPrimary, key)
 		}
 	}
 
+	var missingKeysSecond []string
 	// 3. 从二级缓存获取缺失的键
 	if len(missingKeysPrimary) > 0 {
 		values, err := dc.secondaryCache.MGet(dc.cacheCtx, missingKeysPrimary...).Result()
 		if err != nil {
 			return nil, err
 		}
-
 		for i, key := range missingKeysPrimary {
 			if values[i] != nil {
 				value := values[i].(string)
@@ -369,15 +368,17 @@ func (dc *DistributedCache) MGetWithLoader(keys []string, loader func(context co
 			}
 		}
 	}
-
-	strings, err := loader(dc.cacheCtx, missingKeysSecond)
-	if err != nil {
-		return nil, err
-	}
-	for i, key := range missingKeysSecond {
-		err := dc.set(key, strings[i])
+	if len(missingKeysSecond) > 0 {
+		strings, err := loader(dc.cacheCtx, missingKeysSecond)
 		if err != nil {
-			return nil, err
+			return result, err
+		}
+		for i, key := range missingKeysSecond {
+			result[key] = strings[i]
+			err := dc.set(key, strings[i])
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

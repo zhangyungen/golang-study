@@ -4,6 +4,7 @@ package base
 import (
 	"errors"
 	"xorm.io/xorm"
+	"zyj.com/golang-study/util/validator"
 	"zyj.com/golang-study/xorm/base/database"
 	"zyj.com/golang-study/xorm/param"
 	"zyj.com/golang-study/xorm/result"
@@ -18,6 +19,10 @@ type BaseDAO[T any, K any] struct {
 
 // GetByID 根据ID获取用户
 func (bd *BaseDAO[T, K]) GetByID(session *xorm.Session, id K) (*T, error) {
+	err := validator.IsEmpty(id, "更新id不合法")
+	if err != nil {
+		return nil, err
+	}
 	var entity T
 	has, err := session.ID(id).Get(&entity)
 	if err != nil {
@@ -30,16 +35,22 @@ func (bd *BaseDAO[T, K]) GetByID(session *xorm.Session, id K) (*T, error) {
 }
 
 // UpdateUserById 更新用户
-func (bd *BaseDAO[T, K]) UpdateById(session *xorm.Session, id K, entity *T) error {
-	_, err := session.ID(id).Update(entity)
-	return err
+func (bd *BaseDAO[T, K]) UpdateById(session *xorm.Session, id K, entity *T) (int64, error) {
+	err := validator.IsEmpty(id, "更新id不合法")
+	if err != nil {
+		return 0, err
+	}
+	count, err := session.ID(id).Update(entity)
+	return count, err
 }
 
 // UpdateUserById 更新用户
-func (bd *BaseDAO[T, K]) BatchUpdateByIds(session *xorm.Session, ids []K, entity *T) error {
-	key, err := database.GetPrimaryKey[T]()
-	_, err = session.In(key, ids).Update(entity)
-	return err
+func (bd *BaseDAO[T, K]) BatchUpdateByIds(session *xorm.Session, ids []K, entity *T) (int64, error) {
+	err := validator.IsEmpty(entity, "更新用户数据不能为空")
+	err2 := validator.IsEmpty(ids, "更新用户ID列表不能为空")
+	key, err3 := database.GetPrimaryKey[T]()
+	count, er4 := session.In(key, ids).Update(entity)
+	return count, errors.Join(err, err2, err3, er4)
 }
 
 // DeleteById 删除用户

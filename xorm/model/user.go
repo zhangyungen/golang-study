@@ -12,6 +12,8 @@ type User struct {
 	Status    int       `xorm:"'status' int default 1" json:"status"`
 	CreatedAt time.Time `xorm:"'created_at' created" json:"createdAt"`
 	UpdatedAt time.Time `xorm:"'updated_at' updated" json:"updatedAt"`
+	Version   int       `xorm:"version"`
+	Deleted   int8      `xorm:"deleted int  default 0"`
 }
 
 func (User) TableName() string {

@@ -59,7 +59,9 @@ func (ud *UserDAO) UpdateUserById(session *xorm.Session, user *model.User) error
 			return errors.New("email already used by another user")
 		}
 	}
-	return ud.BaseDAO.UpdateById(session, user.Id, user)
+	//obj.CopyToObj(user, existing)
+	_, err = ud.BaseDAO.UpdateById(session, user.Id, user)
+	return err
 }
 
 // ExistByEmail 检查邮箱是否存在

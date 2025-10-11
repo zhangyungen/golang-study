@@ -56,7 +56,6 @@ func (us *UserService) GetUserByEmail(email string) (*model.User, error) {
 
 // UpdateUserById 更新用户
 func (us *UserService) UpdateUserById(user *model.User) error {
-	//todo check and model biz
 	if user.Id <= 0 {
 		return errors.New("invalid user id")
 	}

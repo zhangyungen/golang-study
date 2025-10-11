@@ -4,6 +4,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"xorm.io/xorm"
+	"zyj.com/golang-study/util/logger"
 	"zyj.com/golang-study/util/obj"
 	"zyj.com/golang-study/xorm/base/database"
 	"zyj.com/golang-study/xorm/biz"
@@ -35,17 +36,18 @@ func main() {
 
 	//database.GetEngine().Sync2(new(model.User))
 	//业务代码开始
-	user, err := biz.UserCmdBizIns.CreateUser(&param.UserCreate{Name: "zyj2fdsa", Email: "zyj0009@163kkkk.com"})
+	user, err := biz.UserCmdBizIns.CreateUser(&param.UserCreate{Name: "zyj2fffdsa", Email: "zyjff0@fffvvffffkkkk.com"})
 
 	if err != nil {
+		logger.GetSimplifiedStack(err)
 		log.Println("error", err)
 	} else {
 		log.Println("create user", obj.ObjToJsonStr(user))
 	}
 
-	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 1, Name: "zyj2fdsa", Email: "zyj000@163kkkk.com"})
+	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 1, Name: "zyj2fdsaff", Email: "zyj999000@163kkkk.com"})
 
-	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Name: "updatetest"})
+	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 100, Name: "updatetest"})
 
 	if err != nil {
 		log.Println(err)
