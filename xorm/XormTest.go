@@ -45,6 +45,14 @@ func main() {
 	}
 
 	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 1, Name: "zyj2fdsaff", Email: "zyj9899900d0@163kkkk.com"})
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = biz.UserCmdBizIns.BatchUpdateUsersByIds([]int64{1, 2}, &param.UserUpdate{Id: 1, Name: "zyj2fdsaff", Email: "zyj9899900d0@163kkkk.com"})
+	if err != nil {
+		log.Println(err)
+	}
 
 	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 100, Name: "updatetest"})
 

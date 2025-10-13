@@ -1,8 +1,9 @@
-package str
+package strutil
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/google/uuid"
 	"math/rand"
 	"net/mail"
 	"regexp"
@@ -456,4 +457,9 @@ func SubstringByRune(s string, start, length int) string {
 	}
 
 	return string(runes[start:end])
+}
+
+func GenerateUUIDV4() string {
+	uniqueId := uuid.NewString()
+	return uniqueId
 }

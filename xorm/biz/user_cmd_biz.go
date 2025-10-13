@@ -36,6 +36,12 @@ func (biz *UserCmdBiz) UpdateUserById(user *param.UserUpdate) error {
 	return service.UserServiceIns.UpdateUserById(userModel)
 }
 
+func (biz *UserCmdBiz) BatchUpdateUsersByIds(ids []int64, user *param.UserUpdate) error {
+	userModel := obj.ObjToObj[model.User](user)
+	_, err := service.UserServiceIns.BatchUpdateByIds(ids, userModel)
+	return err
+}
+
 // LogIn 登录
 func (biz *UserCmdBiz) LogIn(param *param.UserLogin) (bool, error) {
 	if user, err := biz.userService.GetUserByEmail(param.Email); err != nil {

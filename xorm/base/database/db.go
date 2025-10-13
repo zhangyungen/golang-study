@@ -3,15 +3,14 @@ package database
 import (
 	"errors"
 	_ "github.com/go-sql-driver/mysql"
-	cmap "github.com/orcaman/concurrent-map/v2"
 	"github.com/petermattis/goid"
+	"github.com/puzpuzpuz/xsync/v3"
 	"log"
 	"reflect"
-	"strconv"
 	"sync"
 	"time"
 	"xorm.io/xorm"
-	"zyj.com/golang-study/util/obj"
+	"zyj.com/golang-study/util/objutil"
 )
 
 var (
@@ -21,8 +20,12 @@ var (
 	//idKeyTableMap = make(map[string]string, 1)
 	//sessionMap    sync.Map
 	//idKeyTableMap sync.Map
-	idKeyTableMap = cmap.New[string]()
-	sessionMap    = cmap.New[*xorm.Session]()
+
+	//idKeyTableMap = cmap.New[string]()
+	//sessionMap    = cmap.New[*xorm.Session]()
+
+	sessionMap    = xsync.NewMapOf[int64, *xorm.Session]()
+	idKeyTableMap = xsync.NewMapOf[string, string]()
 )
 
 // Init 初始化数据库连接
@@ -75,21 +78,21 @@ func CloseEngine() error {
 // getDBSession 创建新的数据库会话
 func GetDBSession() *xorm.Session {
 	id := goid.Get() // 直接获取当前 goroutine 的 Id
-	idStr := strconv.FormatInt(id, 10)
-	value, ok := sessionMap.Get(idStr)
+	//value, ok := sessionMap.Load(id)
+	value, ok := sessionMap.Load(id)
 	if ok {
+		//return value.(*xorm.Session)
 		return value
 	}
 	session := getEngine().NewSession()
-	sessionMap.Set(idStr, session)
+	sessionMap.Store(id, session)
 	return session
 }
 
 // ReturnSession 关闭数据库回话
 func ReturnSession(session *xorm.Session) {
 	id := goid.Get() // 直接获取当前 goroutine 的 Id
-	idStr := strconv.FormatInt(id, 10)
-	holdSession, ok := sessionMap.Get(idStr)
+	holdSession, ok := sessionMap.Load(id)
 	if !ok {
 		log.Println("argument session is not ok ,don't close ")
 	}
@@ -101,7 +104,7 @@ func ReturnSession(session *xorm.Session) {
 	}
 	if !session.IsInTx() {
 		err := session.Close()
-		sessionMap.Remove(idStr)
+		sessionMap.Delete(id)
 		if err != nil {
 			log.Println("close session failed:", err)
 		}
@@ -144,8 +147,9 @@ func GetPrimaryKey[T any]() (string, error) {
 	var t T
 	r := reflect.TypeOf(t)
 	typeString := r.PkgPath() + "." + r.Name()
-	value, b := idKeyTableMap.Get(typeString)
+	value, b := idKeyTableMap.Load(typeString)
 	if b {
+		//return value.(string), nil
 		return value, nil
 	}
 	engine := getEngine()
@@ -157,7 +161,7 @@ func GetPrimaryKey[T any]() (string, error) {
 
 	for _, col := range table.Columns() {
 		if col.IsPrimaryKey {
-			idKeyTableMap.Set(typeString, col.Name)
+			idKeyTableMap.Store(typeString, col.Name)
 			return col.Name, nil
 		}
 	}
@@ -172,7 +176,7 @@ func QueryRowsBySql[T any](session *xorm.Session, sql string) ([]T, error) {
 	count := len(exec)
 	var rows = make([]T, 0, count)
 	for _, v := range exec {
-		t := obj.MapToObjByStr[T](v)
+		t := objutil.MapToObjByStr[T](v)
 		rows = append(rows, *t)
 	}
 	return rows, nil
@@ -191,7 +195,7 @@ func QueryRowBySql[T any](session *xorm.Session, sql string) (*T, error) {
 		return &t, errors.New("not rows found")
 	}
 	for _, v := range exec {
-		t = *obj.MapToObjByStr[T](v)
+		t = *objutil.MapToObjByStr[T](v)
 	}
 	return &t, nil
 }

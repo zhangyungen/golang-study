@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"zyj.com/golang-study/util/data"
+	"zyj.com/golang-study/util/datautil"
 )
 
 type IDable interface {
@@ -52,15 +52,15 @@ func main() {
 
 	// 使用方法二
 	fmt.Println("\n=== 方法二：灵活泛型 ===")
-	result2 := data.MergeSlicesGeneric(users, orders,
+	result2 := datautil.MergeSlicesGeneric(users, orders,
 		func(u User) int { return u.ID },
 		func(o Order) int { return o.UserID },
-		data.LeftJoin,
+		datautil.LeftJoin,
 	)
 	for _, r := range result2 {
 		fmt.Printf("Result: %+v\n", r)
 	}
-	result3 := data.LeftJoinData[Order, User, Order](orders, users,
+	result3 := datautil.LeftJoinData[Order, User, Order](orders, users,
 		func(l Order) int { return l.UserID },
 		func(r User) int { return r.ID },
 		func(l Order, r User) Order {

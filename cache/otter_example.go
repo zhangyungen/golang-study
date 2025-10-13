@@ -8,7 +8,7 @@ import (
 	"github.com/maypok86/otter/v2"
 	"github.com/maypok86/otter/v2/stats"
 	"time"
-	"zyj.com/golang-study/util/data"
+	"zyj.com/golang-study/util/datautil"
 	"zyj.com/golang-study/xorm/biz"
 	"zyj.com/golang-study/xorm/model"
 )
@@ -93,7 +93,7 @@ func ExampleOtter() {
 		if err != nil {
 			return nil, err
 		}
-		maps := data.MapKeyObjectPtr[model.User, int64](users,
+		maps := datautil.MapKeyObjectPtr[model.User, int64](users,
 			func(user model.User) int64 { return user.Id })
 		return maps, nil
 	})
