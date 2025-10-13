@@ -3,7 +3,7 @@ package biz
 import (
 	"errors"
 	"time"
-	"zyj.com/golang-study/util/obj"
+	"zyj.com/golang-study/util/objutil"
 	"zyj.com/golang-study/xorm/base"
 	"zyj.com/golang-study/xorm/model"
 	"zyj.com/golang-study/xorm/param"
@@ -24,7 +24,7 @@ var UserCmdBizIns = &UserCmdBiz{base.BaseCmdBizIns,
 
 // CreateUser 创建用户
 func (biz *UserCmdBiz) CreateUser(user *param.UserCreate) (*model.User, error) {
-	toObj := obj.ObjToObj[model.User](user)
+	toObj := objutil.ObjToObj[model.User](user)
 	err := biz.ExecuteTx(func() error {
 		return service.UserServiceIns.CreateUser(toObj)
 	})
@@ -32,12 +32,12 @@ func (biz *UserCmdBiz) CreateUser(user *param.UserCreate) (*model.User, error) {
 }
 
 func (biz *UserCmdBiz) UpdateUserById(user *param.UserUpdate) error {
-	userModel := obj.ObjToObj[model.User](user)
+	userModel := objutil.ObjToObj[model.User](user)
 	return service.UserServiceIns.UpdateUserById(userModel)
 }
 
 func (biz *UserCmdBiz) BatchUpdateUsersByIds(ids []int64, user *param.UserUpdate) error {
-	userModel := obj.ObjToObj[model.User](user)
+	userModel := objutil.ObjToObj[model.User](user)
 	_, err := service.UserServiceIns.BatchUpdateByIds(ids, userModel)
 	return err
 }

@@ -11,6 +11,7 @@ require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.7.0
+	github.com/google/uuid v1.6.0
 	github.com/jinzhu/copier v0.4.0
 	github.com/lib/pq v1.10.7
 	github.com/mattn/go-sqlite3 v1.14.16
@@ -18,11 +19,14 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/petermattis/goid v0.0.0-20250904145737-900bdf8bb490
+	github.com/pkg/errors v0.9.1
+	github.com/puzpuzpuz/xsync/v3 v3.5.1
 	github.com/sasha-s/go-deadlock v0.3.6
 	github.com/spf13/viper v1.3.2
 	github.com/statsig-io/go-sdk v1.40.0
 	go.uber.org/zap v1.27.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
+	modernc.org/strutil v1.1.3
 	xorm.io/xorm v1.3.10
 )
 
@@ -42,7 +46,6 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/goccy/go-yaml v1.18.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -55,7 +58,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml v1.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
-	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/quic-go/quic-go v0.54.0 // indirect
 	github.com/spf13/afero v1.1.2 // indirect
