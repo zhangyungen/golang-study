@@ -425,3 +425,12 @@ func ParseDuration(durationStr string) (time.Duration, error) {
 
 	return totalDuration, nil
 }
+
+// generateTimestamp13 生成13位时间戳(毫秒级)
+func generateTimestamp13() string {
+	return fmt.Sprintf("%d", time.Now().UnixNano()/1e6)
+}
+
+func timestamp13() int64 {
+	return time.Now().UnixNano() / 1e6
+}

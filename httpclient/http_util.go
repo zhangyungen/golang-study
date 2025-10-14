@@ -82,6 +82,7 @@ func NewHTTPClient(baseURL string, opts ...func(*HTTPClient)) *HTTPClient {
 				MaxIdleConns:        100,
 				MaxIdleConnsPerHost: 20,
 				IdleConnTimeout:     90 * time.Second,
+				MaxConnsPerHost:     40,
 			},
 		},
 		defaultOpts: RequestOptions{
@@ -89,7 +90,7 @@ func NewHTTPClient(baseURL string, opts ...func(*HTTPClient)) *HTTPClient {
 				"User-Agent": "Go-HTTP-Client/1.0",
 			},
 			Timeout:    30 * time.Second,
-			RetryTimes: 0,
+			RetryTimes: 1,
 			RetryDelay: 1 * time.Second,
 		},
 	}
@@ -101,11 +102,23 @@ func NewHTTPClient(baseURL string, opts ...func(*HTTPClient)) *HTTPClient {
 	return client
 }
 
+// NewHTTPClient 创建新的 HTTP 客户端
+func DefaultHTTPClient() *HTTPClient {
+	return NewHTTPClient("")
+}
+
 // WithTimeout 设置默认超时时间
 func WithTimeout(timeout time.Duration) func(*HTTPClient) {
 	return func(hc *HTTPClient) {
 		hc.defaultOpts.Timeout = timeout
 		hc.client.Timeout = timeout
+	}
+}
+
+// WithTransport
+func WithTransport(transport *http.Transport) func(*HTTPClient) {
+	return func(hc *HTTPClient) {
+		hc.client.Transport = transport
 	}
 }
 
@@ -276,6 +289,11 @@ func (hc *HTTPClient) mergeOptions(opts *RequestOptions) RequestOptions {
 // Get GET 请求
 func (hc *HTTPClient) Get(path string, opts *RequestOptions) (*Response, error) {
 	return hc.request(MethodGet, path, nil, opts)
+}
+
+// Get GET 请求
+func (hc *HTTPClient) GetWithUrl(url string) (*Response, error) {
+	return hc.request(MethodGet, url, nil, nil)
 }
 
 // Post POST 请求
