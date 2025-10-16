@@ -9,6 +9,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"zyj.com/golang-study/lakala"
+	"zyj.com/golang-study/lakala/auth"
 	"zyj.com/golang-study/lakala/util"
 )
 
@@ -63,7 +65,7 @@ func InitWithConfigPath(configPath string) error {
 	config.ServerUrl = properties["serverUrl"]
 	config.Sm4Key = properties["sm4Key"]
 
-	return InitWithConfig(config)
+	return InitWithConfig(&config)
 }
 
 // InitWithConfig 通过Config初始化SDK
@@ -119,7 +121,7 @@ func InitWithConfig2(config *Config2) error {
 	}
 
 	// 创建API客户端
-	apiClient := client.NewLKLApiClient(
+	apiClient := NewLKLApiClient(
 		config.AppId,
 		httpClient,
 		notificationHandler,
@@ -140,12 +142,12 @@ func InitWithConfig2(config *Config2) error {
 }
 
 // HttpPost 发送POST请求 - 默认无需加解密
-func HttpPost(request *model.LklRequest) (string, error) {
+func HttpPost(request LklRequest) (string, error) {
 	return HttpPostWithEncryption(request, false, false)
 }
 
 // HttpPostWithEncryption 发送带加密的POST请求
-func HttpPostWithEncryption(request *model.LklRequest, reqEncrypt, respDecrypt bool) (string, error) {
+func HttpPostWithEncryption(request LklRequest, reqEncrypt, respDecrypt bool) (string, error) {
 	appId := request.GetLklAppId()
 	if appId == "" {
 		appId = defaultAppId
@@ -158,7 +160,7 @@ func HttpPostWithEncryption(request *model.LklRequest, reqEncrypt, respDecrypt b
 
 	needCrypt := reqEncrypt || respDecrypt
 	if needCrypt && apiClient.Sm4Util == nil {
-		return "", exception.NewSDKExceptionFromEnumsWithInfo(exception.SM4_INIT_FAIL, "appId="+apiClient.AppId)
+		return "", lakala.NewSDKExceptionFromEnumsWithInfo(lakala.SM4_INIT_FAIL, "appId="+apiClient.AppId)
 	}
 
 	url := request.GetFunctionCode().GetUrl()
@@ -245,10 +247,10 @@ func SM4EncryptWithAppId(body, appId string) (string, error) {
 		return "", err
 	}
 	if apiClient.Sm4Util == nil {
-		return "", exception.NewSDKExceptionFromEnumsWithInfo(exception.SM4_INIT_FAIL, "appId="+apiClient.AppId)
+		return "", lakala.NewSDKExceptionFromEnumsWithInfo(lakala.SM4_INIT_FAIL, "appId="+apiClient.AppId)
 	}
 	if strings.TrimSpace(body) == "" {
-		return "", exception.NewSDKExceptionFromEnums(exception.CHECK_FAIL)
+		return "", lakala.NewSDKExceptionFromEnums(lakala.CHECK_FAIL)
 	}
 	return apiClient.Sm4Util.Encrypt(body)
 }
@@ -265,10 +267,10 @@ func SM4DecryptWithAppId(body, appId string) (string, error) {
 		return "", err
 	}
 	if apiClient.Sm4Util == nil {
-		return "", exception.NewSDKExceptionFromEnumsWithInfo(exception.SM4_INIT_FAIL, "appId="+apiClient.AppId)
+		return "", lakala.NewSDKExceptionFromEnumsWithInfo(lakala.SM4_INIT_FAIL, "appId="+apiClient.AppId)
 	}
 	if strings.TrimSpace(body) == "" {
-		return "", exception.NewSDKExceptionFromEnums(exception.CHECK_FAIL)
+		return "", lakala.NewSDKExceptionFromEnums(lakala.CHECK_FAIL)
 	}
 	return apiClient.Sm4Util.Decrypt(body)
 }
@@ -288,32 +290,32 @@ func SetDefaultAppId(appId string) {
 // 内部工具函数
 func validateConfig(config *Config2) error {
 	if strings.TrimSpace(config.AppId) == "" {
-		return exception.NewSDKExceptionFromEnumsWithInfo(exception.CHECK_FAIL, "拉卡拉appId")
+		return lakala.NewSDKExceptionFromEnumsWithInfo(lakala.CHECK_FAIL, "拉卡拉appId")
 	}
 	if strings.TrimSpace(config.SerialNo) == "" {
-		return exception.NewSDKExceptionFromEnumsWithInfo(exception.CHECK_FAIL, "商户证书序列号")
+		return lakala.NewSDKExceptionFromEnumsWithInfo(lakala.CHECK_FAIL, "商户证书序列号")
 	}
 	if strings.TrimSpace(config.PriKey) == "" {
-		return exception.NewSDKExceptionFromEnumsWithInfo(exception.CHECK_FAIL, "商户私钥信息")
+		return lakala.NewSDKExceptionFromEnumsWithInfo(lakala.CHECK_FAIL, "商户私钥信息")
 	}
 	if strings.TrimSpace(config.LklCer) == "" {
-		return exception.NewSDKExceptionFromEnumsWithInfo(exception.CHECK_FAIL, "拉卡拉平台证书")
+		return lakala.NewSDKExceptionFromEnumsWithInfo(lakala.CHECK_FAIL, "拉卡拉平台证书")
 	}
 	if strings.TrimSpace(config.LklNotifyCer) == "" {
-		return exception.NewSDKExceptionFromEnumsWithInfo(exception.CHECK_FAIL, "拉卡拉平台通知验签证书")
+		return lakala.NewSDKExceptionFromEnumsWithInfo(lakala.CHECK_FAIL, "拉卡拉平台通知验签证书")
 	}
 	if strings.TrimSpace(config.ServerUrl) == "" {
-		return exception.NewSDKExceptionFromEnumsWithInfo(exception.CHECK_FAIL, "拉卡拉serverUrl")
+		return lakala.NewSDKExceptionFromEnumsWithInfo(lakala.CHECK_FAIL, "拉卡拉serverUrl")
 	}
 	if config.Sm4Key != "" {
-		if !util.VerifySM4Key(config.Sm4Key) {
-			return exception.NewSDKExceptionFromEnumsWithInfo(exception.CHECK_FAIL, "拉卡拉报文加密对称性密钥")
+		if !util.VerifyKey(config.Sm4Key) {
+			return lakala.NewSDKExceptionFromEnumsWithInfo(lakala.CHECK_FAIL, "拉卡拉报文加密对称性密钥")
 		}
 	}
 	return nil
 }
 
-func createHttpClient(config *client.Config2) (*http.Client, error) {
+func createHttpClient(config *Config2) (*http.Client, error) {
 	// 加载私钥
 	privateKey, err := util.LoadPrivateKeyFromString(config.PriKey)
 	if err != nil {
@@ -326,7 +328,7 @@ func createHttpClient(config *client.Config2) (*http.Client, error) {
 		return nil, err
 	}
 
-	builder := client.NewLklHttpClientBuilder().
+	builder := NewLklHttpClientBuilder().
 		WithMerchant(config.AppId, config.SerialNo, privateKey).
 		WithLklpay([]*x509.Certificate{certificate})
 
@@ -351,15 +353,15 @@ func createSM4Util(sm4Key string) (*util.SM4Util, error) {
 	return util.NewSM4Util(key), nil
 }
 
-func createNotificationHandler(certStr string) (*notification.NotificationHandler, error) {
+func createNotificationHandler(certStr string) (*auth.NotificationHandler, error) {
 	certificate, err := util.LoadCertificateFromString(certStr)
 	if err != nil {
 		return nil, err
 	}
-	return notification.NewNotificationHandler(certificate), nil
+	return auth.NewNotificationHandler(certificate), nil
 }
 
-func getLklApiClient(appId string) (*client.LKLApiClient, error) {
+func getLklApiClient(appId string) (*LKLApiClient, error) {
 	mutex.RLock()
 	defer mutex.RUnlock()
 
@@ -368,23 +370,23 @@ func getLklApiClient(appId string) (*client.LKLApiClient, error) {
 	}
 
 	if appId == "" {
-		return nil, exception.NewSDKExceptionFromEnums(exception.SDK_NOT_INIT)
+		return nil, lakala.NewSDKExceptionFromEnums(lakala.SDK_NOT_INIT)
 	}
 
 	apiClient, exists := lklApiClientMap[appId]
 	if !exists {
-		return nil, exception.NewSDKExceptionFromEnumsWithInfo(exception.SDK_APPID_NOT_INIT, "appId="+appId)
+		return nil, lakala.NewSDKExceptionFromEnumsWithInfo(lakala.SDK_APPID_NOT_INIT, "appId="+appId)
 	}
 
 	return apiClient, nil
 }
 
-func doHttpPost(url, body string, apiClient *client.LKLApiClient) (string, error) {
+func doHttpPost(url, body string, apiClient *LKLApiClient) (string, error) {
 	fmt.Printf("httpPost url:%s\n", url)
 
 	req, err := http.NewRequest("POST", url, strings.NewReader(body))
 	if err != nil {
-		return "", exception.NewSDKException("创建请求失败", err)
+		return "", lakala.NewSDKException("创建请求失败", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
@@ -392,19 +394,19 @@ func doHttpPost(url, body string, apiClient *client.LKLApiClient) (string, error
 
 	resp, err := apiClient.HttpClient.Do(req)
 	if err != nil {
-		return "", exception.NewSDKException("请求执行失败", err)
+		return "", lakala.NewSDKException("请求执行失败", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		respBody, _ := io.ReadAll(resp.Body)
-		return "", exception.NewSDKExceptionWithCode("HTTP_ERROR",
+		return "", lakala.NewSDKExceptionWithCode("HTTP_ERROR",
 			fmt.Sprintf("请求响应失败：%s", string(respBody)))
 	}
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", exception.NewSDKException("读取响应失败", err)
+		return "", lakala.NewSDKException("读取响应失败", err)
 	}
 
 	return string(respBody), nil
