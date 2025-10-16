@@ -57,6 +57,12 @@ type Response struct {
 	Duration   time.Duration
 }
 
+func GetBodyData[T any](r *Response) *T {
+	var data T
+	json.Unmarshal(r.Body, &data)
+	return &data
+}
+
 // FilePart 文件上传部分
 type FilePart struct {
 	FieldName string

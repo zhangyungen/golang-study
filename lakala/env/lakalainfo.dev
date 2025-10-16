@@ -1,0 +1,16 @@
+
+// s2.lakala.com	主域名	https	拉卡拉开放平台的主域名，优先使用该域名
+// openapi.lakala.com	备用	https	拉卡拉开放平台的备用域名，主域名故障时，可采用此域名。
+// openapi.lklbiz.com	备用	https	拉卡拉开放平台的备用域名，主域名故障时，可采用此域名。
+
+
+// 接入方唯一编号（appid）	OP00000003	拉卡拉分配
+// 证书序列号（serial_no）	00dfba8194c41b84cf	接入方生成的cer证书序列号
+// 加签证书	点击下载	接入方生成
+// 商户号（merchant_no）	82229007392000A	商户进件产生
+// 终端号（term_no）	D9296400	商户进件产生
+// 异步通知验签证书	点击下载	拉卡拉分配
+// 国密4（SM4Key）	uIj6CPg1GZAY10dXFfsEAQ==	拉卡拉分配
+
+
+https://test.wsmsd.cn/sit/api/v2/mms/openApi/ledger/applyLedgerMer
