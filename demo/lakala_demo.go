@@ -89,9 +89,10 @@ QsFLQgFyXgvDnzr/o+hQJelW
 	certificate2, err := util.LoadCertificateFromString(lkNotifycer)
 	handler := auth.NewNotificationHandler(certificate2)
 	err = handler.Validate(body3, signature)
+
 	if err != nil {
 		tslog.Error("验证失败" + err.Error())
-		return
+		//return
 	}
 
 	//	解签

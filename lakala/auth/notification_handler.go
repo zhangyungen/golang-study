@@ -2,6 +2,8 @@ package auth
 
 import (
 	"crypto"
+	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
@@ -81,10 +83,12 @@ func (v *LklApiValidator) Validate(response *http.Response) error {
 
 // ValidateNotification 验证通知内容
 func (v *LklApiValidator) ValidateNotification(body, authorization string) bool {
+	tslog.Info("RequestBody：{}" + body)
+	tslog.Info("Authorization：{}" + authorization)
 	authorizationMap := v.getAuthorizationMap(authorization)
 	message := v.buildNotificationMessage(body, authorizationMap)
 	signature := authorizationMap["signature"]
-
+	tslog.Info("Verify：{}" + message)
 	return v.verifier.Verify("", []byte(message), signature)
 }
 
@@ -244,20 +248,36 @@ func (v *NotifyCertificatesVerifier) Verify(serialNumber string, message []byte,
 
 // verify 内部验证方法
 func (v *NotifyCertificatesVerifier) verify(message []byte, signature string) bool {
-	hasher := crypto.SHA256.New()
-	hasher.Write(message)
-	hashed := hasher.Sum(nil)
+	//hasher := crypto.SHA256.New()
+	//hasher.Write(message)
+	//hashed := hasher.Sum(nil)
+	//
+	//sigBytes, err := base64.StdEncoding.DecodeString(signature)
+	//if err != nil {
+	//	return false
+	//}
+	//
+	//err = v.notifyCertificate.CheckSignature(x509.SHA256WithRSA, hashed, sigBytes)
+	//if err != nil {
+	//	tslog.Error("推送通知签名验证失败", zap.Error(err))
+	//	return false
+	//}
 
-	sigBytes, err := base64.StdEncoding.DecodeString(signature)
-	if err != nil {
-		return false
-	}
-
-	err = v.notifyCertificate.CheckSignature(x509.SHA256WithRSA, hashed, sigBytes)
+	signBytes, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
 		tslog.Error("推送通知签名验证失败", zap.Error(err))
 		return false
 	}
+	hash := sha256.Sum256(message)
+	pub, ok := v.notifyCertificate.PublicKey.(*rsa.PublicKey)
+	if !ok {
+		return false
+	}
+	if err := rsa.VerifyPKCS1v15(pub, crypto.SHA256, hash[:], signBytes); err != nil {
+		tslog.Error("推送通知签名验证失败", zap.Error(err))
+		return false
+	}
+
 	return true
 }
 
