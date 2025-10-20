@@ -5,7 +5,7 @@ import (
 	"log"
 	"xorm.io/xorm"
 	"zyj.com/golang-study/util/logger"
-	"zyj.com/golang-study/util/objutil"
+	"zyj.com/golang-study/util/varutil"
 	"zyj.com/golang-study/xorm/base/database"
 	"zyj.com/golang-study/xorm/biz"
 	"zyj.com/golang-study/xorm/dao/sql"
@@ -41,7 +41,7 @@ func main() {
 		logger.GetSimplifiedStack(err)
 		log.Println("error", err)
 	} else {
-		log.Println("create user", objutil.ObjToJsonStr(user))
+		log.Println("create user", varutil.JsonStr(user))
 	}
 
 	err = biz.UserCmdBizIns.UpdateUserById(&param.UserUpdate{Id: 1, Name: "zyj2fdsaff", Email: "zyj9899900d0@163kkkk.com"})
@@ -72,14 +72,14 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	} else {
-		log.Println("分页查询结果", objutil.ObjToJsonStr(pages))
+		log.Println("分页查询结果", varutil.JsonStr(pages))
 	}
 
 	entities, err := biz.UserQueryBizIns.ListUserByIds([]int64{1, 2, 3})
 	if err != nil {
 		log.Println(err)
 	} else {
-		log.Println("列表查询结果", objutil.ObjToJsonStr(entities))
+		log.Println("列表查询结果", varutil.JsonStr(entities))
 	}
 
 	//业务代码结束

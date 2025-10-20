@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"zyj.com/golang-study/util/objutil"
+	"zyj.com/golang-study/util/varutil"
 	"zyj.com/golang-study/xorm/model"
 	"zyj.com/golang-study/xorm/param"
 	"zyj.com/golang-study/xorm/result"
@@ -52,8 +52,8 @@ const (
 func main() {
 
 	var param1 = param.PageParam{Page: 1, PageSize: 10}
-	var param2 = objutil.ObjToObj[result.PageVO[model.User]](&param1)
-	log.Println("param2 ObjToObj", objutil.ObjToJsonStr(param2))
+	var param2 = varutil.ConvertTo[result.PageVO[model.User]](&param1)
+	log.Println("param2 ObjToObj", varutil.PrettyJsonStr(param2))
 
 	param1.PageSize = 1000
 	param1.Page = 11
@@ -62,15 +62,15 @@ func main() {
 	//obj.CopierObj(&param1, &param4)
 	//log.Println("CopierObj param4", obj.ObjToJsonStr(param4))
 
-	obj2Map := objutil.ObjToMap(&param1)
+	obj2Map := varutil.StructToMap(&param1)
 	log.Println("obj2Map", obj2Map)
 
-	param1Ptr := objutil.MapToObj[param.PageParam](obj2Map)
+	param1Ptr := varutil.MapToStruct[param.PageParam](obj2Map)
 	log.Println("MapToObj", param1Ptr)
 
-	json := objutil.ObjToJsonStr(param1)
-	var param3 = objutil.JsonStrToObj[result.PageVO[model.User]](json)
-	log.Println("ObjToJsonStr param3", objutil.ObjToJsonStr(&param3))
+	json := varutil.JsonStr(param1)
+	var param3 = varutil.JsonStrToStruct[result.PageVO[model.User]](json)
+	log.Println("ObjToJsonStr param3", varutil.JsonStr(&param3))
 
 	strs := make([]string, 0)
 	strs = add(strs)

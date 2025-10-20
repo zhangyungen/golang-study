@@ -1,6 +1,6 @@
 package datautil
 
-import "zyj.com/golang-study/util/objutil"
+import "zyj.com/golang-study/util/varutil"
 
 // MergeConfig 聚合配置
 type JoinType string
@@ -116,8 +116,8 @@ func JoinData[L any, R any, O any, K comparable](
 		leftKey := leftKeyFunc(leftItem)
 		if rightItem, exists := rightMap[leftKey]; exists {
 			var out O
-			objutil.CopyToObj(leftItem, &out)
-			objutil.CopyToObj(rightItem, &out)
+			varutil.CopyTo(leftItem, &out)
+			varutil.CopyTo(rightItem, &out)
 			outs = append(outs, out)
 		}
 	}

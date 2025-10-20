@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 	"xorm.io/xorm"
-	"zyj.com/golang-study/util/objutil"
+	"zyj.com/golang-study/util/varutil"
 )
 
 var (
@@ -176,7 +176,7 @@ func QueryRowsBySql[T any](session *xorm.Session, sql string) ([]T, error) {
 	count := len(exec)
 	var rows = make([]T, 0, count)
 	for _, v := range exec {
-		t := objutil.MapToObjByStr[T](v)
+		t := varutil.MapToStructByStr[T](v)
 		rows = append(rows, *t)
 	}
 	return rows, nil
@@ -195,7 +195,7 @@ func QueryRowBySql[T any](session *xorm.Session, sql string) (*T, error) {
 		return &t, errors.New("not rows found")
 	}
 	for _, v := range exec {
-		t = *objutil.MapToObjByStr[T](v)
+		t = *varutil.MapToStructByStr[T](v)
 	}
 	return &t, nil
 }

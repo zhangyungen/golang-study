@@ -1,6 +1,7 @@
-package objutil
+package varutil
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/jinzhu/copier"
 	"github.com/mitchellh/mapstructure"
@@ -8,22 +9,37 @@ import (
 	"reflect"
 )
 
-// ObjToJsonStr 对象转JSON字符串
-func ObjToJsonStr(obj interface{}) string {
-	meta, err := json.Marshal(obj)
+// JsonStr 对象转JSON字符串
+func JsonStr(v interface{}) string {
+	meta, err := json.Marshal(v)
 	if err != nil {
-		log.Println("ObjToJsonStr error ", err)
+		log.Println("JsonStr error ", err)
 		return ""
 	}
 	return string(meta)
 }
 
-// JsonStrToObj 字符串转对象
-func JsonStrToObj[T any](str string) *T {
+func PrettyJsonStr(v interface{}) string {
+
+	marshal, err := json.Marshal(v)
+	if err != nil {
+		log.Fatalf("json序列化失败: %v", err)
+	}
+	var prettyJSON bytes.Buffer
+	err = json.Indent(&prettyJSON, marshal, "", "\t")
+	if err != nil {
+		log.Println("JSON parse error: ", err)
+		return ""
+	}
+	return string(prettyJSON.Bytes())
+}
+
+// JsonStrToStruct 字符串转对象
+func JsonStrToStruct[T any](str string) *T {
 	obj := new(T)
 	err := json.Unmarshal([]byte(str), obj)
 	if err != nil {
-		log.Println("JsonStrToObj error ", err)
+		log.Println("JsonStrToStruct error ", err)
 		return obj
 	}
 	return obj
@@ -36,28 +52,28 @@ func JsonStrToObj[T any](str string) *T {
  * @param s 源对象
  * @param t 目标对象
  */
-func ObjToObj[T any](s interface{}) *T {
+func ConvertTo[T any](s interface{}) *T {
 	var t T
 	err := copier.Copy(&t, s)
 	if err != nil {
-		log.Println("ObjToObj error ", err)
+		log.Println("ConvertTo error ", err)
 	}
 	return &t
 }
 
-//func ObjToObj(s interface{}, t interface{}) {
+//func ConvertTo(s interface{}, t interface{}) {
 //	mapstructure.DecodeMetadata(s, t, &mapstructure.Metadata{Keys: ``})
 //	err := copier.Copy(&t, s)
 //	if err != nil {
-//		log.Println("ObjToObj", err)
+//		log.Println("ConvertTo", err)
 //	}
 //	return &t
 //}
 
-func CopyToObj(s interface{}, t interface{}) {
+func CopyTo(s interface{}, t interface{}) {
 	err := copier.Copy(t, s)
 	if err != nil {
-		log.Println("CopyToObj error ", err)
+		log.Println("CopyTo error ", err)
 	}
 }
 
@@ -72,16 +88,16 @@ func CopyToObj(s interface{}, t interface{}) {
 //	return t
 //}
 
-func ObjToMap(s interface{}) map[interface{}]interface{} {
+func StructToMap(s interface{}) map[interface{}]interface{} {
 	var myMap map[interface{}]interface{}
 	err := mapstructure.Decode(s, &myMap)
 	if err != nil {
-		log.Println("ObjToMap error ", err)
+		log.Println("StructToMap error ", err)
 	}
 	return myMap
 }
 
-func MapToObj[T any](param map[interface{}]interface{}) *T {
+func MapToStruct[T any](param map[interface{}]interface{}) *T {
 	var obj T
 	err := mapstructure.Decode(param, &obj)
 	if err != nil {
@@ -89,7 +105,7 @@ func MapToObj[T any](param map[interface{}]interface{}) *T {
 	}
 	return &obj
 }
-func MapToObjByStr[T any](param map[string]interface{}) *T {
+func MapToStructByStr[T any](param map[string]interface{}) *T {
 	var obj T
 	err := mapstructure.Decode(param, &obj)
 	if err != nil {
