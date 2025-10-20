@@ -3,85 +3,60 @@ package auth
 import (
 	"crypto/rand"
 	"fmt"
-	"io"
-	"net/http"
-	"strconv"
-	"strings"
 	"time"
 )
 
-var symbols = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+// Credentials 定义生成请求头的接口
+type Credentials interface {
+	Schema() string
+	Token(body []byte) (string, error)
+	AppID() string
+}
 
-// LklApiCredentials LKL API凭证
+// LklApiCredentials 实现Authorization生成逻辑
 type LklApiCredentials struct {
-	appId    string
-	signer   Signer
-	serialNo string
+	appID  string
+	serial string
+	signer Signer
 }
 
-func NewLklApiCredentials(appId, serialNo string, signer Signer) *LklApiCredentials {
-	return &LklApiCredentials{
-		appId:    appId,
-		signer:   signer,
-		serialNo: serialNo,
-	}
+func NewLklApiCredentials(appID, serial string, signer Signer) *LklApiCredentials {
+	return &LklApiCredentials{appID: appID, serial: serial, signer: signer}
 }
 
-func (c *LklApiCredentials) GetSchema() string {
+func (c *LklApiCredentials) AppID() string {
+	return c.appID
+}
+
+func (c *LklApiCredentials) Schema() string {
 	return "LKLAPI-SHA256withRSA"
 }
 
-func (c *LklApiCredentials) GetToken(request *http.Request) (string, error) {
-	nonceStr := c.generateNonceStr()
-	timestamp := c.generateTimestamp()
-
-	message, err := c.buildMessage(c.appId, c.serialNo, nonceStr, timestamp, request)
+func (c *LklApiCredentials) Token(body []byte) (string, error) {
+	nonce, err := generateNonce(32)
 	if err != nil {
 		return "", err
 	}
-
-	signature, err := c.signer.Sign([]byte(message))
+	timestamp := time.Now().Unix()
+	message := fmt.Sprintf("%s\n%s\n%d\n%s\n%s\n", c.appID, c.serial, timestamp, nonce, string(body))
+	result, err := c.signer.Sign([]byte(message))
 	if err != nil {
 		return "", err
 	}
-
-	token := fmt.Sprintf("appid=\"%s\",nonce_str=\"%s\",timestamp=\"%s\",serial_no=\"%s\",signature=\"%s\"",
-		c.appId, nonceStr, strconv.FormatInt(timestamp, 10), signature.CertificateSerialNumber, signature.Sign)
-
+	token := fmt.Sprintf("appid=\"%s\",nonce_str=\"%s\",timestamp=\"%d\",serial_no=\"%s\",signature=\"%s\"",
+		c.appID, nonce, timestamp, result.CertificateSerialNum, result.Sign)
 	return token, nil
 }
 
-func (c *LklApiCredentials) GetOpAppId() string {
-	return c.appId
-}
-
-func (c *LklApiCredentials) generateTimestamp() int64 {
-	return time.Now().Unix()
-}
-
-func (c *LklApiCredentials) generateNonceStr() string {
-	bytes := make([]byte, 32)
-	if _, err := rand.Read(bytes); err != nil {
-		// 如果随机数生成失败，使用时间戳作为后备
-		return strconv.FormatInt(time.Now().UnixNano(), 10)
+func generateNonce(length int) (string, error) {
+	const symbols = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	buf := make([]byte, length)
+	random := make([]byte, length)
+	if _, err := rand.Read(random); err != nil {
+		return "", err
 	}
-	for i, b := range bytes {
-		bytes[i] = symbols[b%byte(len(symbols))]
+	for i := range buf {
+		buf[i] = symbols[int(random[i])%len(symbols)]
 	}
-	return string(bytes)
-}
-
-func (c *LklApiCredentials) buildMessage(appid, serialNo, nonce string, timestamp int64, request *http.Request) (string, error) {
-	var body string
-	if request.Body != nil {
-		bodyBytes, err := io.ReadAll(request.Body)
-		if err != nil {
-			return "", err
-		}
-		body = string(bodyBytes)
-		// 重置request.Body，因为已经被读取
-		request.Body = io.NopCloser(strings.NewReader(body))
-	}
-
-	return fmt.Sprintf("%s\n%s\n%d\n%s\n%s\n", appid, serialNo, timestamp, nonce, body), nil
+	return string(buf), nil
 }

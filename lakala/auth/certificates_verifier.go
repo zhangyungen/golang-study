@@ -2,59 +2,74 @@ package auth
 
 import (
 	"crypto"
+	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
+	"errors"
+	"strings"
+	"sync"
 	"time"
 )
 
-// Verifier 验证器接口
-type Verifier interface {
-	Verify(serialNumber string, message []byte, signature string) bool
-	GetValidCertificate() *x509.Certificate
-}
-
-// CertificatesVerifier 证书验证器
+// CertificatesVerifier 管理平台证书集合
 type CertificatesVerifier struct {
-	certificates map[string]*x509.Certificate
+	certs map[string]*x509.Certificate
+	mu    sync.RWMutex
 }
 
 func NewCertificatesVerifier(certificates []*x509.Certificate) *CertificatesVerifier {
-	certMap := make(map[string]*x509.Certificate)
+	result := &CertificatesVerifier{certs: make(map[string]*x509.Certificate)}
 	for _, cert := range certificates {
-		certMap[cert.SerialNumber.String()] = cert
+		result.certs[strings.ToUpper(cert.SerialNumber.Text(16))] = cert
 	}
-	return &CertificatesVerifier{certificates: certMap}
+	return result
 }
 
-func (v *CertificatesVerifier) Verify(serialNumber string, message []byte, signature string) bool {
-	cert, exists := v.certificates[serialNumber]
-	if !exists {
-		return false
+func (v *CertificatesVerifier) Verify(serial string, message []byte, signature string) (bool, error) {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	if serial == "" {
+		return false, errors.New("缺少证书序列号")
 	}
-
-	return v.verify(cert, message, signature)
-}
-
-func (v *CertificatesVerifier) verify(cert *x509.Certificate, message []byte, signature string) bool {
-	hasher := crypto.SHA256.New()
-	hasher.Write(message)
-	hashed := hasher.Sum(nil)
-
-	sigBytes, err := base64.StdEncoding.DecodeString(signature)
+	cert, ok := v.certs[strings.ToUpper(serial)]
+	if !ok {
+		return false, errors.New("未找到匹配的证书")
+	}
+	signBytes, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
-		return false
+		return false, err
 	}
-
-	err = cert.CheckSignature(x509.SHA256WithRSA, hashed, sigBytes)
-	return err == nil
+	hash := sha256.Sum256(message)
+	pub, ok := cert.PublicKey.(*rsa.PublicKey)
+	if !ok {
+		return false, ErrInvalidPublicKey
+	}
+	err = rsa.VerifyPKCS1v15(pub, crypto.SHA256, hash[:], signBytes)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
-func (v *CertificatesVerifier) GetValidCertificate() *x509.Certificate {
-	now := time.Now()
-	for _, cert := range v.certificates {
-		if now.After(cert.NotBefore) && now.Before(cert.NotAfter) {
-			return cert
+func (v *CertificatesVerifier) ValidCertificate() (*x509.Certificate, error) {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	for _, cert := range v.certs {
+		if isCertCurrentlyValid(cert) {
+			return cert, nil
 		}
 	}
-	return nil
+	return nil, errors.New("没有有效的平台证书")
+}
+
+func isCertCurrentlyValid(cert *x509.Certificate) bool {
+	now := time.Now()
+	if now.Before(cert.NotBefore) {
+		return false
+	}
+	if now.After(cert.NotAfter) {
+		return false
+	}
+	return true
 }
