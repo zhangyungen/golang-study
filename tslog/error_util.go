@@ -1,4 +1,4 @@
-package logger
+package tslog
 
 import (
 	"fmt"

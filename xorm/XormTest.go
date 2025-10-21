@@ -4,7 +4,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"xorm.io/xorm"
-	"zyj.com/golang-study/util/logger"
+	"zyj.com/golang-study/tslog"
 	"zyj.com/golang-study/util/varutil"
 	"zyj.com/golang-study/xorm/base/database"
 	"zyj.com/golang-study/xorm/biz"
@@ -38,7 +38,7 @@ func main() {
 	user, err := biz.UserCmdBizIns.CreateUser(&param.UserCreate{Name: "zyj2fffdsa", Email: "zyjff0@ff99fpaffkookkk.com"})
 
 	if err != nil {
-		logger.GetSimplifiedStack(err)
+		tslog.GetSimplifiedStack(err)
 		log.Println("error", err)
 	} else {
 		log.Println("create user", varutil.JsonStr(user))

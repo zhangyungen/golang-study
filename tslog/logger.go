@@ -1,5 +1,5 @@
 // logger/logger.go
-package logger
+package tslog
 
 import (
 	"go.uber.org/zap"
