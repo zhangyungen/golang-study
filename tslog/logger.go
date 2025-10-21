@@ -169,17 +169,17 @@ func Debug(args ...interface{}) {
 	globalLogger.Debug(args...)
 }
 
-func Info(args ...interface{}) {
-	globalLogger.Info(args...)
-}
-
-func Warn(args ...interface{}) {
-	globalLogger.Warn(args...)
-}
-
-func Error(args ...interface{}) {
-	globalLogger.Error(args...)
-}
+//func Info(args ...interface{}) {
+//	globalLogger.Info(args...)
+//}
+//
+//func Warn(args ...interface{}) {
+//	globalLogger.Warn(args...)
+//}
+//
+//func Error(args ...interface{}) {
+//	globalLogger.Error(args...)
+//}
 
 func Fatal(args ...interface{}) {
 	globalLogger.Fatal(args...)
