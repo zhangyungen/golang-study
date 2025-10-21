@@ -55,26 +55,26 @@ const (
 	HTTP_TOO_MANY_REQUESTS HttpCode = 429
 )
 
-// BusinessError 业务逻辑错误
-type BusinessError struct {
+// BizError 业务逻辑错误
+type BizError struct {
 	Code    RespCode `json:"code"`    // 业务错误码
 	Message string   `json:"message"` // 用户友好错误信息
 }
 
-func (e *BusinessError) Error() string {
+func (e *BizError) Error() string {
 	return e.Message
 }
 
-// NewBusinessError 创建业务错误
-func NewBusinessError(message string) error {
-	return errors.Wrap(&BusinessError{
+// NewBizError 创建业务错误
+func NewBizError(message string) error {
+	return errors.Wrap(&BizError{
 		Code:    ClientError,
 		Message: message,
 	}, message)
 }
 
-func NewBusinessErrorCode(code RespCode, message string) error {
-	return errors.Wrap(&BusinessError{
+func NewBizErrCode(code RespCode, message string) error {
+	return errors.Wrap(&BizError{
 		Code:    code,
 		Message: message,
 	}, message)
@@ -111,7 +111,7 @@ func NewSystemError(message string, original error) error {
 	return errors.Wrap(err, message)
 }
 
-func NewSystemErrorCode(code RespCode, message string, original error) error {
+func NewSystemErrCode(code RespCode, message string, original error) error {
 	detail := ""
 	if original != nil {
 		detail = original.Error()

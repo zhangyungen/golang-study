@@ -2,8 +2,12 @@ package ginutil
 
 import (
 	"context"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"zyj.com/golang-study/api"
 	"zyj.com/golang-study/define"
+	"zyj.com/golang-study/pkg/tserror"
 	"zyj.com/golang-study/util/strutil"
 )
 
@@ -32,6 +36,29 @@ func AppendContextDebugMsg(c *gin.Context, msg string) {
 			oriMsg += ", "
 		}
 		c.Set(define.LOG_DEBUG_MSG, oriMsg+msg)
+	}
+}
+
+func Response(ctx *gin.Context, respObj interface{}, err error) {
+
+	result := api.NewResult(respObj, err)
+	ctx.Set(define.RESPONSE_ERROR_CODE, result.Code)
+	if err != nil {
+		ctx.Set(define.RESPONSE_ERROR_DETAIL_MSG, err.Error())
+	}
+	var e *tserror.BizError
+	if errors.As(err, &e) {
+		if len(e.Message) == 0 {
+			ctx.Set(define.RESPONSE_ERROR_DETAIL_MSG, err.Error())
+		}
+		if result.Code == http.StatusUnauthorized {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+		} else {
+			ctx.JSON(http.StatusBadRequest, result)
+		}
+	} else {
+		ctx.Set(define.RESPONSE_ERROR_STACK, result.Stack)
+		ctx.JSON(http.StatusInternalServerError, result)
 	}
 }
 
