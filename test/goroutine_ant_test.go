@@ -15,18 +15,18 @@ func TestAntsRun(t *testing.T) {
 	var wg sync.WaitGroup
 
 	// 提交任务
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 3; i++ {
 		wg.Add(1)
 		n := i
 		// 提交任务
 		err := p.Submit(func() {
+			defer wg.Done()
 			time.Sleep(time.Second * 3)
 			// 故意抛出错误
-			if n > 0 {
+			if n > 1 {
 				panic("运行遇到错误~")
 			}
 			fmt.Println("run end time: ", time.Now().Format("2006-01-02 15:04:05"))
-			wg.Done()
 		})
 		if err != nil {
 			fmt.Println("submit err:", err)
@@ -35,10 +35,16 @@ func TestAntsRun(t *testing.T) {
 	// 打印当前运行的协程数量
 	fmt.Println("run go num: ", p.Running())
 	fmt.Println("cap go num: ", p.Cap())
+	fmt.Println("free go num: ", p.Free())
 	// 主动等待协程运行完成
 	wg.Wait()
 	fmt.Println("run go num: ", p.Running())
 	fmt.Println("cap go num: ", p.Cap())
+	fmt.Println("free go num: ", p.Free())
+	time.Sleep(time.Second * 3)
+	fmt.Println("run go num: ", p.Running())
+	fmt.Println("cap go num: ", p.Cap())
+	fmt.Println("free go num: ", p.Free())
 
 	fmt.Println("finish")
 }
