@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/panjf2000/ants/v2"
+	"sync"
 	"testing"
 	"time"
 )
@@ -11,11 +12,14 @@ func TestAntsRun(t *testing.T) {
 	// 延迟关闭默认池
 	p, _ := ants.NewPool(10000)
 	defer p.Release()
+	var wg sync.WaitGroup
+
 	// 提交任务
 	for i := 0; i < 2; i++ {
 		n := i
 		// 提交任务
 		err := p.Submit(func() {
+			wg.Add(1)
 			time.Sleep(time.Second * 3)
 			// 故意抛出错误
 			if n > 0 {
