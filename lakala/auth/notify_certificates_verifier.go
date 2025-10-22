@@ -19,6 +19,20 @@ func NewNotifyCertificatesVerifier(cert *x509.Certificate) *NotifyCertificatesVe
 }
 
 func (v *NotifyCertificatesVerifier) Verify(_ string, message []byte, signature string) (bool, error) {
+
+	//hasher := crypto.SHA256.New()
+	//hasher.Write(message)
+	//hashed := hasher.Sum(nil)
+	//
+	//sigBytes, err := base64.StdEncoding.DecodeString(signature)
+	//if err != nil {
+	//	return false
+	//}
+	//
+	//err = cert.CheckSignature(x509.SHA256WithRSA, hashed, sigBytes)
+	//return err == nil
+	//
+
 	signBytes, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
 		return false, err

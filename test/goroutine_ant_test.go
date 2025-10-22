@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/panjf2000/ants/v2"
+	"log"
 	"sync"
 	"testing"
 	"time"
@@ -10,6 +11,7 @@ import (
 
 func TestAntsRun(t *testing.T) {
 	// 延迟关闭默认池
+
 	p, _ := ants.NewPool(10000)
 	defer p.Release()
 	var wg sync.WaitGroup
@@ -61,3 +63,30 @@ finish
 --- PASS: TestAntsRun (10.00s)
 PASS
 */
+
+func TestAntsRun2(t *testing.T) {
+	var wg sync.WaitGroup
+	// 生成一个具有特定函数的goroutine池 容量为10
+	p, err := ants.NewPoolWithFunc(50, func(i interface{}) {
+		taskFunc(i.(int))
+		wg.Done()
+	})
+	if err != nil {
+		log.Fatal("goroutine pool create err:", err)
+	}
+	defer p.Release() // 函数结束后关闭此池并释放工作队列
+
+	for i := 0; i < 1000; i++ {
+		wg.Add(1)       // 每执行一次进行+1计数
+		_ = p.Invoke(i) //  提交一个任务到创建的goroutine池中
+	}
+	wg.Wait() // 阻塞等待任务执行完成
+	fmt.Println("结束goroutine使用")
+
+}
+
+// taskFunc 执行耗时任务
+func taskFunc(i int) {
+	time.Sleep(2 * time.Second) // 模拟耗时任务
+	fmt.Println("输出:", i)
+}

@@ -2,8 +2,7 @@ package notification
 
 import (
 	"net/http"
-
-	"github.com/lakala/laop-sdk-go/pkg/laopsdk/auth"
+	"zyj.com/golang-study/lakala/auth"
 )
 
 // Handler 负责通知验签解析
